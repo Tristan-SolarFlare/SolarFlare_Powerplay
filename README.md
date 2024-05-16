@@ -622,7 +622,7 @@ Version 5.5 requires Android Studio 4.0 or later.
 ### Breaking changes
 * Removes support for Android versions 4.4 through 5.1 (KitKat and Lollipop). The minSdkVersion is now 23.
 * Removes the deprecated `LinearOpMode` methods `waitOneFullHardwareCycle()` and `waitForNextHardwareCycle()`
-### Enhancements w
+### Enhancements
 * Handles RS485 address of Control Hub automatically
     * The Control Hub is automatically given a reserved address
     * Existing configuration files will continue to work
