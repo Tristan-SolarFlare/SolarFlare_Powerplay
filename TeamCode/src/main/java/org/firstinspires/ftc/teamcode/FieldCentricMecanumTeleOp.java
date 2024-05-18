@@ -23,6 +23,7 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
         DcMotor frontRightMotor = hardwareMap.dcMotor.get("frontRightMotor");
         DcMotor backRightMotor = hardwareMap.dcMotor.get("backRightMotor");
 
+        boolean slowMode = false;
         // Reverse the right side motors. This may be wrong for your setup.
         // If your robot moves backwards when commanded to go forwards,
         // reverse the left side instead.
@@ -44,6 +45,8 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
         if (isStopRequested()) return;
 
         while (opModeIsActive()) {
+
+
             double y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
             double x = gamepad1.left_stick_x;
             double rx = gamepad1.right_stick_x;
@@ -54,6 +57,7 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
             if (gamepad1.options) {
                 imu.resetYaw();
             }
+
 
             double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
@@ -67,11 +71,26 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
             // This ensures all the powers maintain the same ratio,
             // but only if at least one is out of the range [-1, 1]
             double denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(rx), 1);
+
+
+            if (gamepad1.left_bumper) {
+                slowMode = !slowMode;
+
+            }
+
             double frontLeftPower = (rotY + rotX + rx) / denominator;
             double backLeftPower = (rotY - rotX + rx) / denominator;
             double frontRightPower = (rotY - rotX - rx) / denominator;
             double backRightPower = (rotY + rotX - rx) / denominator;
 
+            if (slowMode == false) {
+                frontLeftPower = 0.5 * (rotY + rotX + rx) / denominator;
+                backLeftPower = 0.5 * (rotY - rotX + rx) / denominator;
+                frontRightPower = 0.5 * (rotY - rotX - rx) / denominator;
+                backRightPower = 0.5 * (rotY + rotX - rx) / denominator;
+
+
+            }
             frontLeftMotor.setPower(frontLeftPower);
             backLeftMotor.setPower(backLeftPower);
             frontRightMotor.setPower(frontRightPower);
