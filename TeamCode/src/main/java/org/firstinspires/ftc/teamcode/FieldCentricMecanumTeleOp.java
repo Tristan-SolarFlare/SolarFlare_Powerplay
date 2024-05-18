@@ -16,6 +16,8 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
         // Make sure your ID's match your configuration
 
         //dani was here
+        //tristan was also here
+
         DcMotor frontLeftMotor = hardwareMap.dcMotor.get("frontLeftMotor");
         DcMotor backLeftMotor = hardwareMap.dcMotor.get("backLeftMotor");
         DcMotor frontRightMotor = hardwareMap.dcMotor.get("frontRightMotor");
