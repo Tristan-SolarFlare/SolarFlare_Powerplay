@@ -75,7 +75,6 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
 
             if (gamepad1.left_bumper) {
                 slowMode = !slowMode;
-
             }
 
             double frontLeftPower = (rotY + rotX + rx) / denominator;
@@ -83,14 +82,14 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
             double frontRightPower = (rotY - rotX - rx) / denominator;
             double backRightPower = (rotY + rotX - rx) / denominator;
 
-            if (slowMode == false) {
+            if (gamepad1.left_bumper) {
                 frontLeftPower = 0.5 * (rotY + rotX + rx) / denominator;
                 backLeftPower = 0.5 * (rotY - rotX + rx) / denominator;
                 frontRightPower = 0.5 * (rotY - rotX - rx) / denominator;
                 backRightPower = 0.5 * (rotY + rotX - rx) / denominator;
-
-
             }
+
+
             frontLeftMotor.setPower(frontLeftPower);
             backLeftMotor.setPower(backLeftPower);
             frontRightMotor.setPower(frontRightPower);
