@@ -1,12 +1,15 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotorImpl;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import com.qualcomm.robotcore.hardware.DcMotorImplEx;
+
 
 @TeleOp
 public class FieldCentricMecanumTeleOp extends LinearOpMode {
@@ -19,10 +22,15 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
         //tristan was also here
         //arick was absent
 
+        double slidePower = 0.2;
+
         DcMotor frontLeftMotor = hardwareMap.dcMotor.get("frontLeftMotor");
         DcMotor backLeftMotor = hardwareMap.dcMotor.get("backLeftMotor");
         DcMotor frontRightMotor = hardwareMap.dcMotor.get("frontRightMotor");
         DcMotor backRightMotor = hardwareMap.dcMotor.get("backRightMotor");
+
+        DcMotorImplEx slide1 = hardwareMap.get(DcMotorImplEx.class,"slide1");
+        DcMotorImplEx slide2 = hardwareMap.get(DcMotorImplEx.class,"slide2");
 
         // Reverse the right side motors. This may be wrong for your setup.
         // If your robot moves backwards when commanded to go forwards,
@@ -40,6 +48,20 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
         // Without this, the REV Hub's orientation is assumed to be logo up / USB forward
         imu.initialize(parameters);
 
+        //initalize slides
+        slide1.setDirection(DcMotorSimple.Direction.REVERSE);
+        slide2.setDirection(DcMotorSimple.Direction.REVERSE);
+        slide1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        slide2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        slide1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        slide2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        slide1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slide2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        slide1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        slide2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         waitForStart();
 
         if (isStopRequested()) return;
@@ -47,7 +69,7 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
         while (opModeIsActive()) {
 
 
-            double y = gamepad1.left_stick_y; // Remember, Y stick value is reversed
+            double y = gamepad1.left_stick_y; // keeping y stick value not reversed for testing purposes
             double x = gamepad1.left_stick_x;
             double rx = gamepad1.right_stick_x;
 
@@ -81,6 +103,21 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
                 backLeftPower = 0.5 * (rotY - rotX + rx) / denominator;
                 frontRightPower = 0.5 * (rotY - rotX - rx) / denominator;
                 backRightPower = 0.5 * (rotY + rotX - rx) / denominator;
+            }
+            else if (gamepad1.a){
+                slide1.setTargetPosition(50);
+                slide1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                slide1.setVelocity(200);
+                slide2.setTargetPosition(50);
+                slide2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                slide2.setVelocity(200);
+            }else if (gamepad1.y){
+                slide1.setTargetPosition(-50);
+                slide1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                slide1.setVelocity(200);
+                slide2.setTargetPosition(-50);
+                slide2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                slide2.setVelocity(200);
             }
 
 
