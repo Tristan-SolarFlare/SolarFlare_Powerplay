@@ -29,8 +29,8 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
         DcMotor frontRightMotor = hardwareMap.dcMotor.get("frontRightMotor");
         DcMotor backRightMotor = hardwareMap.dcMotor.get("backRightMotor");
 
-        DcMotorImplEx slide1 = hardwareMap.get(DcMotorImplEx.class,"slide1");
-        DcMotorImplEx slide2 = hardwareMap.get(DcMotorImplEx.class,"slide2");
+        DcMotor slide1 = hardwareMap.get(DcMotor.class,"slide1");
+        DcMotor slide2 = hardwareMap.get(DcMotor.class,"slide2");
 
         // Reverse the right side motors. This may be wrong for your setup.
         // If your robot moves backwards when commanded to go forwards,
@@ -49,18 +49,21 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
         imu.initialize(parameters);
 
         //initalize slides
-        slide1.setDirection(DcMotorSimple.Direction.REVERSE);
-        slide2.setDirection(DcMotorSimple.Direction.REVERSE);
+        slide1.setDirection(DcMotorSimple.Direction.FORWARD);
+        slide2.setDirection(DcMotorSimple.Direction.FORWARD);
         slide1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         slide2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+        /*
         slide1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         slide2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         slide1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slide2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        */
 
-        slide1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        slide2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        slide1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        slide2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         waitForStart();
 
@@ -104,6 +107,9 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
                 frontRightPower = 0.5 * (rotY - rotX - rx) / denominator;
                 backRightPower = 0.5 * (rotY + rotX - rx) / denominator;
             }
+            slide1.setPower(0.5 * (gamepad1.left_trigger-gamepad1.right_trigger));
+            slide2.setPower(0.5 * (gamepad1.left_trigger-gamepad1.right_trigger));
+            /*
             else if (gamepad1.a){
                 slide1.setTargetPosition(50);
                 slide1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -119,6 +125,9 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
                 slide2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 slide2.setVelocity(200);
             }
+
+             */
+
 
 
             frontLeftMotor.setPower(frontLeftPower);
