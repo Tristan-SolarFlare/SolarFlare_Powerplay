@@ -60,12 +60,15 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
         slide1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slide2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         */
-
+        slide1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slide2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         slide1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         slide2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         waitForStart();
+
+        double target = 0;
 
         if (isStopRequested()) return;
 
@@ -106,30 +109,24 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
                 backLeftPower = 0.5 * (rotY - rotX + rx) / denominator;
                 frontRightPower = 0.5 * (rotY - rotX - rx) / denominator;
                 backRightPower = 0.5 * (rotY + rotX - rx) / denominator;
-            }
-            slide1.setPower(0.5 * (gamepad1.left_trigger-gamepad1.right_trigger));
-            slide2.setPower(0.5 * (gamepad1.left_trigger-gamepad1.right_trigger));
-            /*
-            else if (gamepad1.a){
-                slide1.setTargetPosition(50);
-                slide1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                slide1.setVelocity(200);
-                slide2.setTargetPosition(50);
-                slide2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                slide2.setVelocity(200);
-            }else if (gamepad1.y){
-                slide1.setTargetPosition(-50);
-                slide1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                slide1.setVelocity(200);
-                slide2.setTargetPosition(-50);
-                slide2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                slide2.setVelocity(200);
+            }else if (gamepad1.a){ //reset to pickup position
+                target=0;
+                //commit: add code to set servos back to norm position.
+            }else if (gamepad1.b){ //low junction
+                target=100; //rough estimate - we have to tune the encoder positions
+            }else if(gamepad1.x){ //mid junction
+                target = 75;// rough estimate - this has to be changed, the reason this is lower than low junction is because we get the added distance from the flip
+                //commit: add code to flip servos
+            }else if(gamepad1.y){ //high junction
+                target = 150; //tune encoders
+                //add code to flip servos
             }
 
-             */
-
-
-
+            //add sync slide code
+            slide1.setPower(0.75 * (gamepad1.left_trigger-gamepad1.right_trigger));
+            slide2.setPower(0.75 * (gamepad1.left_trigger-gamepad1.right_trigger));
+            
+            // set powers for driving
             frontLeftMotor.setPower(frontLeftPower);
             backLeftMotor.setPower(backLeftPower);
             frontRightMotor.setPower(frontRightPower);
