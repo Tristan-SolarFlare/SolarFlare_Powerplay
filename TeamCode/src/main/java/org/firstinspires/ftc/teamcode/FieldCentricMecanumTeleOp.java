@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import com.qualcomm.robotcore.hardware.DcMotorImplEx;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 
 @TeleOp
@@ -17,20 +17,21 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         // Declare our motors
         // Make sure your ID's match your configuration
-
-        //dani was here
-        //tristan was also here
-        //arick was absent
+        double Kp = 0.02;
 
         double slidePower = 0.2;
+
+        final double motorPPR = 145.1;
+        final double ticksPerCM = (int) Math.round(145.1 / 12);
+
 
         DcMotor frontLeftMotor = hardwareMap.dcMotor.get("frontLeftMotor");
         DcMotor backLeftMotor = hardwareMap.dcMotor.get("backLeftMotor");
         DcMotor frontRightMotor = hardwareMap.dcMotor.get("frontRightMotor");
         DcMotor backRightMotor = hardwareMap.dcMotor.get("backRightMotor");
 
-        DcMotor slide1 = hardwareMap.get(DcMotor.class,"slide1");
-        DcMotor slide2 = hardwareMap.get(DcMotor.class,"slide2");
+        DcMotorEx slide1 = hardwareMap.get(DcMotorEx.class,"slide1");
+        DcMotorEx slide2 = hardwareMap.get(DcMotorEx.class,"slide2");
 
         // Reverse the right side motors. This may be wrong for your setup.
         // If your robot moves backwards when commanded to go forwards,
@@ -54,12 +55,6 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
         slide1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         slide2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        /*
-        slide1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        slide2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        slide1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        slide2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        */
         slide1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slide2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
@@ -104,6 +99,9 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
             double frontRightPower = (rotY - rotX - rx) / denominator;
             double backRightPower = (rotY + rotX - rx) / denominator;
 
+            double liftSpeed = 250; // ticks per second
+            double lastTime = System.currentTimeMillis()/1000d;
+
             if (gamepad1.left_bumper) { // Checks for left bumper input, slows all motors by 50%
                 frontLeftPower = 0.5 * (rotY + rotX + rx) / denominator;
                 backLeftPower = 0.5 * (rotY - rotX + rx) / denominator;
@@ -121,11 +119,34 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
                 target = 150; //tune encoders
                 //add code to flip servos
             }
+            /*
+            double currentTime = System.currentTimeMillis()/1000d;
+            //double deltaTime = currentTime - lastTime;
+            // lastTime = currentTime;
+            // adjust target based on game pad inputs
+            double slideinput = (gamepad1.left_trigger-gamepad1.right_trigger);
 
-            //add sync slide code
-            slide1.setPower(0.75 * (gamepad1.left_trigger-gamepad1.right_trigger));
-            slide2.setPower(0.75 * (gamepad1.left_trigger-gamepad1.right_trigger));
-            
+            target += (slideinput * currentTime  * liftSpeed) % 145.1;
+
+            slide1.setPower(0.2*slideinput);
+            slide2.setPower(0.2*slideinput);
+
+
+            double error1 = target - slide1.getCurrentPosition();
+            double error2 = target - slide2.getCurrentPosition();
+
+            slide1.setPower(error1*Kp);
+            slide2.setPower(error2*Kp);
+
+             */
+            double slideinput = (gamepad1.left_trigger-gamepad1.right_trigger);
+
+            slide1.setPower(0.75*slideinput);
+            slide2.setPower(0.75*slideinput);
+
+            telemetry.addData("Slide1:",slide1.getCurrentPosition());
+            telemetry.addData("Slide2:",slide2.getCurrentPosition());
+
             // set powers for driving
             frontLeftMotor.setPower(frontLeftPower);
             backLeftMotor.setPower(backLeftPower);
