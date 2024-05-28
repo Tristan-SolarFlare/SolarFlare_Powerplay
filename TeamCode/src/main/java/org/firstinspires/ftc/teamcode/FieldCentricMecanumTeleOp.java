@@ -121,58 +121,23 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
                 //slide2.setPower(0.75);
 
                 if (target<600){
-                    target= target + 10;
+                    target= target + 15;
                 }
 
             }else if(gamepad1.right_bumper){
                 //slide1.setPower(-0.5);
                 //slide2.setPower(-0.5);
-                if (target > 0){
-                    target = target - 10;
+                if (target > -1){
+                    target = target - 15;
                 }
             }
 
 
-            /*
-            // adjust target based on game pad inputs
-            double slideinput = (gamepad1.left_trigger-gamepad1.right_trigger);
-
-            target += (slideinput * liftSpeed);
-
-            double error1 = target - slide1.getCurrentPosition();
-            double error2 = target - slide2.getCurrentPosition();
-
-            slide1.setPower(error1*Kp+slideinput);
-            slide2.setPower(error2*Kp+slideinput);
-
-
-            telemetry.addData("Slide1:",slide1.getCurrentPosition());
-            telemetry.addData("Slide2:",slide2.getCurrentPosition());
-
-             */
-            /*
-            if (slide1.getCurrentPosition()>600){
-                target = 600;
-            }
-            else if (slide1.getCurrentPosition()<-1){
-                target = 0;
-            }
-
-            if (slide2.getCurrentPosition()>600){
-                target = 600;
-            }
-            else if (slide2.getCurrentPosition()<-1){
-                target = 0;
-            }
-
-
-             */
             double error1=-(target-slide1.getCurrentPosition());
             double slide1power;
-            if (Math.abs(error1)>100){
+            if (Math.abs(error1)>80){
                 slide1power = (0.75*error1);
             }
-
             else {
                 slide1power = (Kp*error1);
             }
@@ -180,7 +145,7 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
 
             double error2=target-slide2.getCurrentPosition();
             double slide2power;
-            if (Math.abs(error2)>100){
+            if (Math.abs(error2)>80){
                 slide2power = 0.75*error2;
             }
 
