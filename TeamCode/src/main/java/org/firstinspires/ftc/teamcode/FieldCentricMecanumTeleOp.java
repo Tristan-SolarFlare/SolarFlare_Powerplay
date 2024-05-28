@@ -13,17 +13,17 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 @TeleOp
 public class FieldCentricMecanumTeleOp extends LinearOpMode {
+    double target = 0;
     @Override
     public void runOpMode() throws InterruptedException {
         // Declare our motors
         // Make sure your ID's match your configuration
-        double Kp = 0.02;
+        double Kp = 0.015;
 
         double slidePower = 0.2;
 
         final double motorPPR = 145.1;
         final double ticksPerCM = (int) Math.round(145.1 / 12);
-
 
         DcMotor frontLeftMotor = hardwareMap.dcMotor.get("frontLeftMotor");
         DcMotor backLeftMotor = hardwareMap.dcMotor.get("backLeftMotor");
@@ -50,7 +50,7 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
         imu.initialize(parameters);
 
         //initalize slides
-        slide1.setDirection(DcMotorSimple.Direction.FORWARD);
+        slide1.setDirection(DcMotorSimple.Direction.REVERSE);
         slide2.setDirection(DcMotorSimple.Direction.FORWARD);
         slide1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         slide2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -62,8 +62,6 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
         slide2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         waitForStart();
-
-        double target = 0;
 
         if (isStopRequested()) return;
 
@@ -100,58 +98,111 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
             double backRightPower = (rotY + rotX - rx) / denominator;
 
             double liftSpeed = 250; // ticks per second
-            double lastTime = System.currentTimeMillis()/1000d;
 
-            if (gamepad1.left_bumper) { // Checks for left bumper input, slows all motors by 50%
+            if (gamepad1.left_trigger>0.5) { // Checks for left bumper input, slows all motors by 50%
                 frontLeftPower = 0.5 * (rotY + rotX + rx) / denominator;
                 backLeftPower = 0.5 * (rotY - rotX + rx) / denominator;
                 frontRightPower = 0.5 * (rotY - rotX - rx) / denominator;
                 backRightPower = 0.5 * (rotY + rotX - rx) / denominator;
-            }else if (gamepad1.a){ //reset to pickup position
+            }
+            if (gamepad1.a){ //reset to pickup position
                 target=0;
-                //commit: add code to set servos back to norm position.
             }else if (gamepad1.b){ //low junction
-                target=100; //rough estimate - we have to tune the encoder positions
+                target=320; //rough estimate - we have to tune the encoder positions
             }else if(gamepad1.x){ //mid junction
-                target = 75;// rough estimate - this has to be changed, the reason this is lower than low junction is because we get the added distance from the flip
+                target = 150;// rough estimate - this has to be changed, the reason this is lower than low junction is because we get the added distance from the flip
                 //commit: add code to flip servos
             }else if(gamepad1.y){ //high junction
-                target = 150; //tune encoders
+                target = 500; //tune encoders
                 //add code to flip servos
             }
+            if(gamepad1.left_bumper){
+                //slide1.setPower(0.75);
+                //slide2.setPower(0.75);
+
+                if (target<600){
+                    target= target + 10;
+                }
+
+            }else if(gamepad1.right_bumper){
+                //slide1.setPower(-0.5);
+                //slide2.setPower(-0.5);
+                if (target > 0){
+                    target = target - 10;
+                }
+            }
+
+
             /*
-            double currentTime = System.currentTimeMillis()/1000d;
-            //double deltaTime = currentTime - lastTime;
-            // lastTime = currentTime;
             // adjust target based on game pad inputs
             double slideinput = (gamepad1.left_trigger-gamepad1.right_trigger);
 
-            target += (slideinput * currentTime  * liftSpeed) % 145.1;
-
-            slide1.setPower(0.2*slideinput);
-            slide2.setPower(0.2*slideinput);
-
+            target += (slideinput * liftSpeed);
 
             double error1 = target - slide1.getCurrentPosition();
             double error2 = target - slide2.getCurrentPosition();
 
-            slide1.setPower(error1*Kp);
-            slide2.setPower(error2*Kp);
+            slide1.setPower(error1*Kp+slideinput);
+            slide2.setPower(error2*Kp+slideinput);
 
-             */
-            double slideinput = (gamepad1.left_trigger-gamepad1.right_trigger);
-
-            slide1.setPower(0.75*slideinput);
-            slide2.setPower(0.75*slideinput);
 
             telemetry.addData("Slide1:",slide1.getCurrentPosition());
             telemetry.addData("Slide2:",slide2.getCurrentPosition());
 
+             */
+            /*
+            if (slide1.getCurrentPosition()>600){
+                target = 600;
+            }
+            else if (slide1.getCurrentPosition()<-1){
+                target = 0;
+            }
+
+            if (slide2.getCurrentPosition()>600){
+                target = 600;
+            }
+            else if (slide2.getCurrentPosition()<-1){
+                target = 0;
+            }
+
+
+             */
+            double error1=-(target-slide1.getCurrentPosition());
+            double slide1power;
+            if (Math.abs(error1)>100){
+                slide1power = (0.75*error1);
+            }
+
+            else {
+                slide1power = (Kp*error1);
+            }
+            slide1.setPower(slide1power);
+
+            double error2=target-slide2.getCurrentPosition();
+            double slide2power;
+            if (Math.abs(error2)>100){
+                slide2power = 0.75*error2;
+            }
+
+            else {
+                slide2power = Kp*error2;
+            }
+            slide2.setPower(slide2power);
+
+            telemetry.addData("Slide1:",slide1.getCurrentPosition());
+            telemetry.addData("Slide2:",slide2.getCurrentPosition());
+            telemetry.addData("Target:",target);
+            telemetry.addData("Error1:",error1);
+            telemetry.addData("Error2:",error2);
+            telemetry.addData("Slide 1 Power:",slide1power);
+            telemetry.addData("slide 2 power:",slide2power);
+
+            telemetry.update();
             // set powers for driving
-            frontLeftMotor.setPower(frontLeftPower);
-            backLeftMotor.setPower(backLeftPower);
-            frontRightMotor.setPower(frontRightPower);
-            backRightMotor.setPower(backRightPower);
+            //frontLeftMotor.setPower(frontLeftPower);
+            //backLeftMotor.setPower(backLeftPower);
+            //frontRightMotor.setPower(frontRightPower);
+            //backRightMotor.setPower(backRightPower);
         }
     }
 }
