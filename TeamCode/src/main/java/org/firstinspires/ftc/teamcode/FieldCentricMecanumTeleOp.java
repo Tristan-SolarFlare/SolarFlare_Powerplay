@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.Servo;
 
 
 @TeleOp
@@ -20,6 +21,10 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
         // Make sure your ID's match your configuration
         double Kp = 0.015;
 
+
+        double arm1pos = 0.30;
+        double arm2pos = 0.30;
+
         double slidePower = 0.2;
 
         final double motorPPR = 145.1;
@@ -29,6 +34,13 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
         DcMotor backLeftMotor = hardwareMap.dcMotor.get("backLeftMotor");
         DcMotor frontRightMotor = hardwareMap.dcMotor.get("frontRightMotor");
         DcMotor backRightMotor = hardwareMap.dcMotor.get("backRightMotor");
+
+        Servo arm1 = hardwareMap.servo.get("arm");
+        Servo arm2 = hardwareMap.servo.get("arm2");
+
+        Servo claw = hardwareMap.servo.get("claw");
+
+        Servo wrist = hardwareMap.servo.get("wrist");
 
         DcMotorEx slide1 = hardwareMap.get(DcMotorEx.class,"slide1");
         DcMotorEx slide2 = hardwareMap.get(DcMotorEx.class,"slide2");
@@ -60,6 +72,8 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
 
         slide1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         slide2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        arm1.setDirection(Servo.Direction.REVERSE);
 
         waitForStart();
 
@@ -97,6 +111,7 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
             double frontRightPower = (rotY - rotX - rx) / denominator;
             double backRightPower = (rotY + rotX - rx) / denominator;
 
+
             double liftSpeed = 250; // ticks per second
 
             if (gamepad1.left_trigger>0.5) { // Checks for left bumper input, slows all motors by 50%
@@ -111,7 +126,7 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
                 target=320; //rough estimate - we have to tune the encoder positions
             }else if(gamepad1.x){ //mid junction
                 target = 150;// rough estimate - this has to be changed, the reason this is lower than low junction is because we get the added distance from the flip
-                //commit: add code to flip servos
+                arm1pos = 0.7;
             }else if(gamepad1.y){ //high junction
                 target = 500; //tune encoders
                 //add code to flip servos
@@ -131,12 +146,16 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
                     target = target - 15;
                 }
             }
+            claw.setPosition(gamepad1.right_trigger * 0.3);
 
+            //arm2pos=arm1pos-0; //tune this
+            arm1.setPosition(arm1pos);
+            arm2.setPosition(arm2pos);
 
             double error1=-(target-slide1.getCurrentPosition());
             double slide1power;
             if ((Math.abs(error1)>80)){
-                slide1power = (0.45*error1);
+                slide1power = (0.75*error1);
             }
             else {
                 slide1power = (Kp*error1);
@@ -146,7 +165,7 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
             double error2=target-slide2.getCurrentPosition();
             double slide2power;
             if ((Math.abs(error2)>80)){
-                slide2power = 0.45*error2;
+                slide2power = 0.75*error2;
             }
 
             else {
