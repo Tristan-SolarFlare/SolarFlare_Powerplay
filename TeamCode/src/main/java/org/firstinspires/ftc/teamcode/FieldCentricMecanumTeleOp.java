@@ -135,8 +135,8 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
 
             double error1=-(target-slide1.getCurrentPosition());
             double slide1power;
-            if (Math.abs(error1)>80){
-                slide1power = (0.75*error1);
+            if ((Math.abs(error1)>80)){
+                slide1power = (0.45*error1);
             }
             else {
                 slide1power = (Kp*error1);
@@ -145,8 +145,8 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
 
             double error2=target-slide2.getCurrentPosition();
             double slide2power;
-            if (Math.abs(error2)>80){
-                slide2power = 0.75*error2;
+            if ((Math.abs(error2)>80)){
+                slide2power = 0.45*error2;
             }
 
             else {
@@ -164,10 +164,10 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
 
             telemetry.update();
             // set powers for driving
-            //frontLeftMotor.setPower(frontLeftPower);
-            //backLeftMotor.setPower(backLeftPower);
-            //frontRightMotor.setPower(frontRightPower);
-            //backRightMotor.setPower(backRightPower);
+            frontLeftMotor.setPower(frontLeftPower);
+            backLeftMotor.setPower(backLeftPower);
+            frontRightMotor.setPower(frontRightPower);
+            backRightMotor.setPower(backRightPower);
         }
     }
 }
