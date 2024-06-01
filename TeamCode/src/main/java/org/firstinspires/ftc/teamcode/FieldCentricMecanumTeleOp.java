@@ -52,6 +52,11 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
         frontRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         backRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        frontLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
         // Retrieve the IMU from the hardware map
         IMU imu = hardwareMap.get(IMU.class, "imu");
         // Adjust the orientation parameters to match your robot
@@ -84,7 +89,7 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
 
             double y = -gamepad1.left_stick_y; // y stick value should be reversed
             double x = gamepad1.left_stick_x;
-            double rx = -gamepad1.right_stick_x;
+            double rx = gamepad1.right_stick_x;
 
             // This button choice was made so that it is hard to hit on accident,
             // it can be freely changed based on preference.
@@ -135,7 +140,7 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
                 //slide1.setPower(0.75);
                 //slide2.setPower(0.75);
 
-                if (target<600){
+                if (target<645){
                     target= target + 15;
                 }
 
