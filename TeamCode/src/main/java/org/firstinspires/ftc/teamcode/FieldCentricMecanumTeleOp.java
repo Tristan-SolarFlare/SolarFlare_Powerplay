@@ -133,7 +133,7 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
                 target = 150;// rough estimate - this has to be changed, the reason this is lower than low junction is because we get the added distance from the flip
                 arm1pos = 0.7;
             }else if(gamepad1.y){ //high junction
-                target = 500; //tune encoders
+                target = 440; //tune encoders
                 //add code to flip servos
             }
             if(gamepad1.left_bumper){
