@@ -22,8 +22,10 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
         double Kp = 0.015;
 
 
-        double arm1pos = 0.30;
-        double arm2pos = 0.30;
+        double arm1pos = 0.02;
+        double arm2pos = 0.02;
+
+        double wristpos= 0.91;
 
         double slidePower = 0.2;
 
@@ -127,14 +129,22 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
             }
             if (gamepad1.a){ //reset to pickup position
                 target=0;
+                wristpos=0.91;
+                arm1pos=0.02;
+                arm2pos=0.02;
             }else if (gamepad1.b){ //low junction
-                target=320; //rough estimate - we have to tune the encoder positions
+                target=440; //rough estimate - we have to tune the encoder positions
             }else if(gamepad1.x){ //mid junction
-                target = 150;// rough estimate - this has to be changed, the reason this is lower than low junction is because we get the added distance from the flip
-                arm1pos = 0.7;
+                target = 250;// rough estimate - this has to be changed, the reason this is lower than low junction is because we get the added distance from the flip
+                arm1pos = 0.96;
+                arm2pos=0.96;
+                wristpos=0.2;
             }else if(gamepad1.y){ //high junction
-                target = 440; //tune encoders
+                target = 430; //tune encoders
                 //add code to flip servos
+                arm1pos = 0.96;
+                arm2pos=0.96;
+                wristpos=0.2;
             }
             if(gamepad1.left_bumper){
                 //slide1.setPower(0.75);
@@ -152,10 +162,9 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
                 }
             }
             claw.setPosition(gamepad1.right_trigger * 0.3);
-
-            //arm2pos=arm1pos-0; //tune this
             arm1.setPosition(arm1pos);
             arm2.setPosition(arm2pos);
+            wrist.setPosition((wristpos));
 
             double error1=-(target-slide1.getCurrentPosition());
             double slide1power;
@@ -185,7 +194,7 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
             telemetry.addData("Error2:",error2);
             telemetry.addData("Slide 1 Power:",slide1power);
             telemetry.addData("slide 2 power:",slide2power);
-
+            telemetry.addData("Wrist position:",wrist.getPosition());
             telemetry.update();
             // set powers for driving
             frontLeftMotor.setPower(frontLeftPower);
