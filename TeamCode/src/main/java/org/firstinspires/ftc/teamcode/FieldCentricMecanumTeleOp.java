@@ -14,12 +14,13 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp
 public class FieldCentricMecanumTeleOp extends LinearOpMode {
-    double target = 0;
+    // target position of linear slides in ticks (not related to actual position)
+    double linearSlidesTarget = 0;
     @Override
     public void runOpMode() throws InterruptedException {
-        // Declare our motors
-        // Make sure your ID's match your configuration
+
         double Kp = 0.015;
+        // Initialize default motor positions
 
 
         double arm1pos = 0.02;
@@ -29,13 +30,16 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
 
         double slidePower = 0.2;
 
-        final double motorPPR = 145.1;
-        final double ticksPerCM = (int) Math.round(145.1 / 12);
 
+        final double MOTOR_PPR = 145.1; // aka ticks per rotation
+        final double TICKS_PER_CM = (int) Math.round(145.1 / 12);
+
+        // Maps motors and servos
         DcMotor frontLeftMotor = hardwareMap.dcMotor.get("frontLeftMotor");
         DcMotor backLeftMotor = hardwareMap.dcMotor.get("backLeftMotor");
         DcMotor frontRightMotor = hardwareMap.dcMotor.get("frontRightMotor");
         DcMotor backRightMotor = hardwareMap.dcMotor.get("backRightMotor");
+
 
         Servo arm1 = hardwareMap.servo.get("arm");
         Servo arm2 = hardwareMap.servo.get("arm2");
@@ -47,28 +51,28 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
         DcMotorEx slide1 = hardwareMap.get(DcMotorEx.class,"slide1");
         DcMotorEx slide2 = hardwareMap.get(DcMotorEx.class,"slide2");
 
-        // Reverse the right side motors. This may be wrong for your setup.
-        // If your robot moves backwards when commanded to go forwards,
-        // reverse the left side instead.
-        // See the note about this earlier on this page.
+        // Retrieves the IMU from the hardware map
+        IMU imu = hardwareMap.get(IMU.class, "imu");
+
+        // Orients motors to allow for forward movement
         frontRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         backRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        // Ensures that when no power is set on the motors they will hold their position
         frontLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         frontRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        // Retrieve the IMU from the hardware map
-        IMU imu = hardwareMap.get(IMU.class, "imu");
-        // Adjust the orientation parameters to match your robot
+        // Our robots orientation
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
                 RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
                 RevHubOrientationOnRobot.UsbFacingDirection.UP));
+
         // Without this, the REV Hub's orientation is assumed to be logo up / USB forward
         imu.initialize(parameters);
 
-        //initalize slides
+        // Initalize slides
         slide1.setDirection(DcMotorSimple.Direction.REVERSE);
         slide2.setDirection(DcMotorSimple.Direction.FORWARD);
         slide1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -128,19 +132,19 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
                 backRightPower = 0.5 * (rotY + rotX - rx) / denominator;
             }
             if (gamepad1.a){ //reset to pickup position
-                target=0;
+                linearSlidesTarget=0;
                 wristpos=0.91;
                 arm1pos=0.02;
                 arm2pos=0.02;
             }else if (gamepad1.b){ //low junction
-                target=440; //rough estimate - we have to tune the encoder positions
+                linearSlidesTarget=440; //rough estimate - we have to tune the encoder positions
             }else if(gamepad1.x){ //mid junction
-                target = 250;// rough estimate - this has to be changed, the reason this is lower than low junction is because we get the added distance from the flip
+                linearSlidesTarget = 250;// rough estimate - this has to be changed, the reason this is lower than low junction is because we get the added distance from the flip
                 arm1pos = 0.96;
                 arm2pos=0.96;
                 wristpos=0.2;
             }else if(gamepad1.y){ //high junction
-                target = 430; //tune encoders
+                linearSlidesTarget = 430; //tune encoders
                 //add code to flip servos
                 arm1pos = 0.96;
                 arm2pos=0.96;
@@ -150,15 +154,15 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
                 //slide1.setPower(0.75);
                 //slide2.setPower(0.75);
 
-                if (target<645){
-                    target= target + 15;
+                if (linearSlidesTarget<645){
+                    linearSlidesTarget= linearSlidesTarget + 15;
                 }
 
             }else if(gamepad1.right_bumper){
                 //slide1.setPower(-0.5);
                 //slide2.setPower(-0.5);
-                if (target > -1){
-                    target = target - 15;
+                if (linearSlidesTarget > -1){
+                    linearSlidesTarget = linearSlidesTarget - 15;
                 }
             }
             claw.setPosition(gamepad1.right_trigger * 0.3);
@@ -166,7 +170,7 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
             arm2.setPosition(arm2pos);
             wrist.setPosition((wristpos));
 
-            double error1=-(target-slide1.getCurrentPosition());
+            double error1=-(linearSlidesTarget-slide1.getCurrentPosition());
             double slide1power;
             if ((Math.abs(error1)>80)){
                 slide1power = (0.75*error1);
@@ -176,7 +180,7 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
             }
             slide1.setPower(slide1power);
 
-            double error2=target-slide2.getCurrentPosition();
+            double error2=linearSlidesTarget-slide2.getCurrentPosition();
             double slide2power;
             if ((Math.abs(error2)>80)){
                 slide2power = 0.75*error2;
@@ -189,7 +193,7 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
 
             telemetry.addData("Slide1:",slide1.getCurrentPosition());
             telemetry.addData("Slide2:",slide2.getCurrentPosition());
-            telemetry.addData("Target:",target);
+            telemetry.addData("Target:",linearSlidesTarget);
             telemetry.addData("Error1:",error1);
             telemetry.addData("Error2:",error2);
             telemetry.addData("Slide 1 Power:",slide1power);
