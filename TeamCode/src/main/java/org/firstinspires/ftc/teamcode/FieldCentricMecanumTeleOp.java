@@ -80,10 +80,8 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
 
         arm1.setDirection(Servo.Direction.REVERSE);
 
-
         // Target position in ticks for linear slides, will be used later
         double linearSlidesTarget = 0;
-
 
         // Set slides Kp value
         double Kp = 0.015;
@@ -172,9 +170,9 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
             arm1.setPosition(arm1pos);
             arm2.setPosition(arm2pos);
             wrist.setPosition((wristpos));
-            
+
             // We need a new slide1 power that will correct for error
-            double slide1power = 0;
+            double slide1power;
 
             // Calculates amount of ticks off slide1 is from target
             double error1=-(linearSlidesTarget-slide1.getCurrentPosition()); // Error is negative because slide1 needs to reverse direction

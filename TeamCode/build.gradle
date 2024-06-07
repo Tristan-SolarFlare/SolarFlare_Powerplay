@@ -29,7 +29,7 @@ dependencies {
 
     implementation 'org.ftclib.ftclib:vision:2.1.0' // vision
     implementation 'org.ftclib.ftclib:core:2.1.1' // core
-    implementation 'org.openftc:easyopencv:1.5.2'
+    implementation 'org.openftc:easyopencv:1.7.2'
     implementation 'org.openftc:apriltag:2.0.0'
 
 }
