@@ -73,7 +73,7 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
         slide2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         arm1.setDirection(Servo.Direction.REVERSE);
-        
+
         //Set slides Kp value
         double Kp = 0.015;
         // Initialize default  positions
