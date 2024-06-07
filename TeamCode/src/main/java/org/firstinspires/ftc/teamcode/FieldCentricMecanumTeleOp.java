@@ -24,13 +24,6 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
         double wristpos= 0.91;
         double slidePower = 0.2;
 
-
-    // target position of linear slides in ticks (not related to actual position)
-
-    
-    public void runOpMode() throws InterruptedException {
-
-
         final double MOTOR_PPR = 145.1; // aka ticks per rotation
         final double TICKS_PER_CM = (int) Math.round(145.1 / 12);
 
@@ -92,21 +85,8 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
         double linearSlidesTarget = 0;
 
 
-        //Set slides Kp value
+        // Set slides Kp value
         double Kp = 0.015;
-        // Initialize default  positions
-
-        double linearSlidesTarget = 0;
-
-        double arm1pos = 0.02;
-        double arm2pos = 0.02;
-
-        double wristpos= 0.91;
-
-        double slidePower = 0.2;
-
-
-
 
         waitForStart();
 
@@ -139,7 +119,6 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
             double backLeftPower = (rotY - rotX + rx) / denominator;
             double frontRightPower = (rotY - rotX - rx) / denominator;
             double backRightPower = (rotY + rotX - rx) / denominator;
-
 
             double liftSpeed = 250; // ticks per second
 
@@ -193,10 +172,7 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
             arm1.setPosition(arm1pos);
             arm2.setPosition(arm2pos);
             wrist.setPosition((wristpos));
-
-            // Kp is how fast the loop decreases error
-            double Kp = 0.015;
-
+            
             // We need a new slide1 power that will correct for error
             double slide1power = 0;
 
