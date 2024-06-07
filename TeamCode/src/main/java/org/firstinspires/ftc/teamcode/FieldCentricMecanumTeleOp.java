@@ -15,21 +15,9 @@ import com.qualcomm.robotcore.hardware.Servo;
 @TeleOp
 public class FieldCentricMecanumTeleOp extends LinearOpMode {
     // target position of linear slides in ticks (not related to actual position)
-    double linearSlidesTarget = 0;
+
     @Override
     public void runOpMode() throws InterruptedException {
-
-        double Kp = 0.015;
-        // Initialize default motor positions
-
-
-        double arm1pos = 0.02;
-        double arm2pos = 0.02;
-
-        double wristpos= 0.91;
-
-        double slidePower = 0.2;
-
 
         final double MOTOR_PPR = 145.1; // aka ticks per rotation
         final double TICKS_PER_CM = (int) Math.round(145.1 / 12);
@@ -85,6 +73,21 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
         slide2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         arm1.setDirection(Servo.Direction.REVERSE);
+        
+        //Set slides Kp value
+        double Kp = 0.015;
+        // Initialize default  positions
+
+        double linearSlidesTarget = 0;
+
+        double arm1pos = 0.02;
+        double arm2pos = 0.02;
+
+        double wristpos= 0.91;
+
+        double slidePower = 0.2;
+
+
 
         waitForStart();
 
