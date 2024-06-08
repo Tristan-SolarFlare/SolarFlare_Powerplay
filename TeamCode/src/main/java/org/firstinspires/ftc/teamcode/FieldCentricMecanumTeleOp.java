@@ -21,7 +21,6 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
         double arm1pos = 0.02;
         double arm2pos = 0.02;
         double wristpos= 0.91;
-        double slidePower = 0.2;
 
         final double MOTOR_PPR = 145.1; // aka ticks per rotation
         final double TICKS_PER_CM = (int) Math.round(145.1 / 12);
