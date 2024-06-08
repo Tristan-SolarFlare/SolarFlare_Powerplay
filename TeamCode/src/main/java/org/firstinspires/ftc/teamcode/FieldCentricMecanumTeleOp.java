@@ -11,7 +11,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 
-//owowowowowowo daddy
 @TeleOp
 public class FieldCentricMecanumTeleOp extends LinearOpMode {
 
@@ -85,12 +84,6 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
 
         // Set slides Kp value
         double Kp = 0.015;
-
-
-
-
-        // We need a new slide2 power that will correct for error
-        double slide2power;
 
         waitForStart();
 
@@ -193,6 +186,9 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
                 slide1power = (Kp*error1);
             }
             slide1.setPower(slide1power);
+
+            // We need a new slide2 power that will correct for error
+            double slide2power;
 
             // Calculates amount of ticks off slide2 is from target
             double error2=linearSlidesTarget-slide2.getCurrentPosition();
