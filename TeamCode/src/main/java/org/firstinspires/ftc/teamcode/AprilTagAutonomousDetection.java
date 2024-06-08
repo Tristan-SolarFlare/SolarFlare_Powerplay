@@ -48,9 +48,14 @@ public class AprilTagAutonomousDetection extends LinearOpMode
     // UNITS ARE PIXELS
     // NOTE: this calibration is for the C920 webcam at 800x448.
     // You will need to do your own calibration for other configurations!
+
+    // The x-axis focal length of the camera in pixels
     double fx = 578.272;
+    // The y-axis focal length of the camera in pixels
     double fy = 578.272;
+    // The x-axis optical center of the camera in pixels
     double cx = 402.145;
+    // The y-axis optical center of the camera in pixels.
     double cy = 221.506;
 
     // UNITS ARE METERS
