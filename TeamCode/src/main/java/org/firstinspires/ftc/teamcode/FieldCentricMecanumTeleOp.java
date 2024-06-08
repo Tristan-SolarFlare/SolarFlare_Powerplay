@@ -17,7 +17,7 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-        // Initialize default motor positions
+        // Initialize default servo po sitions
         double arm1pos = 0.02;
         double arm2pos = 0.02;
         double wristpos= 0.91;
@@ -134,7 +134,7 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
                 linearSlidesTarget=440; //rough estimate - we have to tune the encoder positions
 
             }else if (gamepad1.x){ // Mid junction
-                linearSlidesTarget = 250;// rough estimate - this has to be changed, the reason this is lower than low junction is because we get the added distance from the flip
+                linearSlidesTarget = 150;// rough estimate - this has to be changed, the reason this is lower than low junction is because we get the added distance from the flip
                 arm1pos = 0.96;
                 arm2pos=0.96;
                 wristpos=0.2;
@@ -150,7 +150,7 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
                 //slide1.setPower(0.75);
                 //slide2.setPower(0.75);
 
-                if (linearSlidesTarget<645){
+                if (linearSlidesTarget<630){
                     linearSlidesTarget= linearSlidesTarget + 15;
                 }
 
