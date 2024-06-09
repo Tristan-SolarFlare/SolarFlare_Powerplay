@@ -34,7 +34,10 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -93,5 +96,66 @@ public class FieldCentricMecanumAutonomous extends LinearOpMode {
     @Override
     public void runOpMode(){
 
+        // Initialize default servo positions
+        double arm1pos = 0.02;
+        double arm2pos = 0.02;
+        double wristpos= 0.91;
+
+        final double MOTOR_PPR = 145.1; // aka ticks per rotation
+        final double TICKS_PER_CM = (int) Math.round(145.1 / 12);
+
+        // Maps motors and servos
+        DcMotor frontLeftMotor = hardwareMap.dcMotor.get("frontLeftMotor");
+        DcMotor backLeftMotor = hardwareMap.dcMotor.get("backLeftMotor");
+        DcMotor frontRightMotor = hardwareMap.dcMotor.get("frontRightMotor");
+        DcMotor backRightMotor = hardwareMap.dcMotor.get("backRightMotor");
+
+        Servo arm1 = hardwareMap.servo.get("arm");
+        Servo arm2 = hardwareMap.servo.get("arm2");
+
+        Servo claw = hardwareMap.servo.get("claw");
+
+        Servo wrist = hardwareMap.servo.get("wrist");
+
+        DcMotorEx slide1 = hardwareMap.get(DcMotorEx.class,"slide1");
+        DcMotorEx slide2 = hardwareMap.get(DcMotorEx.class,"slide2");
+
+
+        // Retrieves the IMU from the hardware map
+        IMU imu = hardwareMap.get(IMU.class, "imu");
+
+        // Orients motors to allow for forward movement
+        frontRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        backRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        // Ensures that when no power is set on the motors they will hold their position
+        frontLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        // Our robots logo direction and usb direction
+        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
+                RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
+                RevHubOrientationOnRobot.UsbFacingDirection.UP));
+
+        // Without this, the REV Hub's orientation is assumed to be logo up / USB forward
+        imu.initialize(parameters);
+
+        // Initalize slides
+        slide1.setDirection(DcMotorSimple.Direction.REVERSE);
+        slide2.setDirection(DcMotorSimple.Direction.FORWARD);
+
+        // Ensures that when no power is set on the motors they will hold their position
+        slide1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        slide2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        slide1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slide2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        slide1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        slide2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        arm1.setDirection(Servo.Direction.REVERSE);
     }
 }
