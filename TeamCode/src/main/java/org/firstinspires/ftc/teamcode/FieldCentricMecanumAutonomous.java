@@ -89,36 +89,34 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 @Autonomous
 public class FieldCentricMecanumAutonomous extends LinearOpMode {
+    // Initialize default servo positions
+    double arm1pos = 0.02;
+    double arm2pos = 0.02;
+    double wristpos= 0.91;
+
+    final double MOTOR_PPR = 145.1; // aka ticks per rotation
+    final double TICKS_PER_CM = (int) Math.round(145.1 / 12);
+
+    // Maps motors and servos
+    DcMotor frontLeftMotor = hardwareMap.dcMotor.get("frontLeftMotor");
+    DcMotor backLeftMotor = hardwareMap.dcMotor.get("backLeftMotor");
+    DcMotor frontRightMotor = hardwareMap.dcMotor.get("frontRightMotor");
+    DcMotor backRightMotor = hardwareMap.dcMotor.get("backRightMotor");
+
+    Servo arm1 = hardwareMap.servo.get("arm");
+    Servo arm2 = hardwareMap.servo.get("arm2");
+
+    Servo claw = hardwareMap.servo.get("claw");
+
+    Servo wrist = hardwareMap.servo.get("wrist");
+
+    DcMotorEx slide1 = hardwareMap.get(DcMotorEx.class,"slide1");
+    DcMotorEx slide2 = hardwareMap.get(DcMotorEx.class,"slide2");
+    // Retrieves the IMU from the hardware map
+    IMU imu = hardwareMap.get(IMU.class, "imu");
+
     @Override
     public void runOpMode(){
-
-        // Initialize default servo positions
-        double arm1pos = 0.02;
-        double arm2pos = 0.02;
-        double wristpos= 0.91;
-
-        final double MOTOR_PPR = 145.1; // aka ticks per rotation
-        final double TICKS_PER_CM = (int) Math.round(145.1 / 12);
-
-        // Maps motors and servos
-        DcMotor frontLeftMotor = hardwareMap.dcMotor.get("frontLeftMotor");
-        DcMotor backLeftMotor = hardwareMap.dcMotor.get("backLeftMotor");
-        DcMotor frontRightMotor = hardwareMap.dcMotor.get("frontRightMotor");
-        DcMotor backRightMotor = hardwareMap.dcMotor.get("backRightMotor");
-
-        Servo arm1 = hardwareMap.servo.get("arm");
-        Servo arm2 = hardwareMap.servo.get("arm2");
-
-        Servo claw = hardwareMap.servo.get("claw");
-
-        Servo wrist = hardwareMap.servo.get("wrist");
-
-        DcMotorEx slide1 = hardwareMap.get(DcMotorEx.class,"slide1");
-        DcMotorEx slide2 = hardwareMap.get(DcMotorEx.class,"slide2");
-
-
-        // Retrieves the IMU from the hardware map
-        IMU imu = hardwareMap.get(IMU.class, "imu");
 
         // Orients motors to allow for forward movement
         frontRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -153,5 +151,71 @@ public class FieldCentricMecanumAutonomous extends LinearOpMode {
         slide2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         arm1.setDirection(Servo.Direction.REVERSE);
+    }
+
+    //vv just arick messing around lol vv
+    private void moveAtAngle(double angle){
+        double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+        double relativeAngle = botHeading-angle;
+        double ratio = Math.tan(relativeAngle);
+        double xPow;
+        double yPow;
+        if(ratio<=1){
+            xPow=1;
+            yPow=xPow*ratio;
+        }
+        else{
+            yPow=1;
+            xPow=yPow*(1/ratio);
+        }
+
+        if(xPow>0 && yPow>0){
+            frontLeftMotor.setPower(1);
+            backRightMotor.setPower(1);
+            if(xPow!=1){
+                frontRightMotor.setPower(1-xPow);
+                backLeftMotor.setPower(1-xPow);
+            }
+            else{
+                frontRightMotor.setPower(yPow-1);
+                backLeftMotor.setPower(yPow-1);
+            }
+        }
+        else if(xPow<0 && yPow>0){
+            frontRightMotor.setPower(1);
+            backLeftMotor.setPower(1);
+            if(xPow!=-1){
+                frontLeftMotor.setPower(xPow+1);
+                backRightMotor.setPower(xPow+1);
+            }
+            else{
+                frontLeftMotor.setPower(yPow-1);
+                backRightMotor.setPower(yPow-1);
+            }
+        }
+        else if(xPow<0 && yPow<0){
+            frontLeftMotor.setPower(-1);
+            backRightMotor.setPower(-1);
+            if(xPow!=-1){
+                frontRightMotor.setPower(-xPow-1);
+                backLeftMotor.setPower(-xPow-1);
+            }
+            else{
+                frontRightMotor.setPower(yPow+1);
+                backLeftMotor.setPower(yPow+1);
+            }
+        }
+        else if(xPow>0 && yPow<0){
+            frontRightMotor.setPower(-1);
+            backLeftMotor.setPower(-1);
+            if(xPow!=1){
+                frontLeftMotor.setPower(xPow-1);
+                backRightMotor.setPower(xPow-1);
+            }
+            else{
+                frontLeftMotor.setPower(yPow+1);
+                backRightMotor.setPower(yPow+1);
+            }
+        }
     }
 }
