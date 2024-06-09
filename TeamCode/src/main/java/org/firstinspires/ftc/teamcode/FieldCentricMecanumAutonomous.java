@@ -157,64 +157,69 @@ public class FieldCentricMecanumAutonomous extends LinearOpMode {
     private void moveAtAngle(double angle){
         double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
         double relativeAngle = botHeading-angle;
-        double ratio = Math.tan(relativeAngle);
-        double xPow;
-        double yPow;
-        if(ratio<=1){
-            xPow=1;
-            yPow=xPow*ratio;
-        }
-        else{
-            yPow=1;
-            xPow=yPow*(1/ratio);
-        }
-
-        if(xPow>0 && yPow>0){
+        if(relativeAngle==Math.PI/2){
             frontLeftMotor.setPower(1);
-            backRightMotor.setPower(1);
-            if(xPow!=1){
-                frontRightMotor.setPower(1-xPow);
-                backLeftMotor.setPower(1-xPow);
-            }
-            else{
-                frontRightMotor.setPower(yPow-1);
-                backLeftMotor.setPower(yPow-1);
-            }
-        }
-        else if(xPow<0 && yPow>0){
-            frontRightMotor.setPower(1);
-            backLeftMotor.setPower(1);
-            if(xPow!=-1){
-                frontLeftMotor.setPower(xPow+1);
-                backRightMotor.setPower(xPow+1);
-            }
-            else{
-                frontLeftMotor.setPower(yPow-1);
-                backRightMotor.setPower(yPow-1);
-            }
-        }
-        else if(xPow<0 && yPow<0){
-            frontLeftMotor.setPower(-1);
-            backRightMotor.setPower(-1);
-            if(xPow!=-1){
-                frontRightMotor.setPower(-xPow-1);
-                backLeftMotor.setPower(-xPow-1);
-            }
-            else{
-                frontRightMotor.setPower(yPow+1);
-                backLeftMotor.setPower(yPow+1);
-            }
-        }
-        else if(xPow>0 && yPow<0){
             frontRightMotor.setPower(-1);
+            backRightMotor.setPower(1);
             backLeftMotor.setPower(-1);
-            if(xPow!=1){
-                frontLeftMotor.setPower(xPow-1);
-                backRightMotor.setPower(xPow-1);
+        }
+        else if(relativeAngle==-Math.PI/2){
+            frontLeftMotor.setPower(-1);
+            frontRightMotor.setPower(1);
+            backRightMotor.setPower(-1);
+            backLeftMotor.setPower(1);
+        }
+        else {
+            double ratio = Math.tan(relativeAngle);
+            double xPow;
+            double yPow;
+            if (ratio <= 1) {
+                xPow = 1;
+                yPow = xPow * ratio;
+            } else {
+                yPow = 1;
+                xPow = yPow * (1 / ratio);
             }
-            else{
-                frontLeftMotor.setPower(yPow+1);
-                backRightMotor.setPower(yPow+1);
+            if (xPow > 0 && yPow > 0) {
+                frontLeftMotor.setPower(1);
+                backRightMotor.setPower(1);
+                if (xPow != 1) {
+                    frontRightMotor.setPower(1 - xPow);
+                    backLeftMotor.setPower(1 - xPow);
+                } else {
+                    frontRightMotor.setPower(yPow - 1);
+                    backLeftMotor.setPower(yPow - 1);
+                }
+            } else if (xPow < 0 && yPow > 0) {
+                frontRightMotor.setPower(1);
+                backLeftMotor.setPower(1);
+                if (xPow != -1) {
+                    frontLeftMotor.setPower(xPow + 1);
+                    backRightMotor.setPower(xPow + 1);
+                } else {
+                    frontLeftMotor.setPower(yPow - 1);
+                    backRightMotor.setPower(yPow - 1);
+                }
+            } else if (xPow < 0 && yPow < 0) {
+                frontLeftMotor.setPower(-1);
+                backRightMotor.setPower(-1);
+                if (xPow != -1) {
+                    frontRightMotor.setPower(-xPow - 1);
+                    backLeftMotor.setPower(-xPow - 1);
+                } else {
+                    frontRightMotor.setPower(yPow + 1);
+                    backLeftMotor.setPower(yPow + 1);
+                }
+            } else if (xPow > 0 && yPow < 0) {
+                frontRightMotor.setPower(-1);
+                backLeftMotor.setPower(-1);
+                if (xPow != 1) {
+                    frontLeftMotor.setPower(xPow - 1);
+                    backRightMotor.setPower(xPow - 1);
+                } else {
+                    frontLeftMotor.setPower(yPow + 1);
+                    backRightMotor.setPower(yPow + 1);
+                }
             }
         }
     }
