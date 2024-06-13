@@ -136,7 +136,7 @@ public class FieldCentricMecanumAutonomous extends LinearOpMode {
         // Without this, the REV Hub's orientation is assumed to be logo up / USB forward
         imu.initialize(parameters);
 
-        // Initalize slides
+        // Initialize slides
         slide1.setDirection(DcMotorSimple.Direction.REVERSE);
         slide2.setDirection(DcMotorSimple.Direction.FORWARD);
 
@@ -218,6 +218,26 @@ public class FieldCentricMecanumAutonomous extends LinearOpMode {
                     frontLeftMotor.setPower(yPow + 1);
                     backRightMotor.setPower(yPow + 1);
                 }
+            }
+        }
+    }
+    private void turnRobot(double turnAngle){
+        double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+        while (turnAngle != botHeading){
+            botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+            if(botHeading<0){
+                botHeading=360+botHeading;
+            }
+            if(Math.abs(botHeading-turnAngle)>=180){
+                frontRightMotor.setPower(1);
+                backRightMotor.setPower(1);
+                frontLeftMotor.setPower(-1);
+                backLeftMotor.setPower(-1);
+            } else{
+                frontRightMotor.setPower(-1);
+                backRightMotor.setPower(-1);
+                frontLeftMotor.setPower(1);
+                backLeftMotor.setPower(1);
             }
         }
     }
