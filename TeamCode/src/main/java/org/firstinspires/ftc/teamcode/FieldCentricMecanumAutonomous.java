@@ -154,9 +154,9 @@ public class FieldCentricMecanumAutonomous extends LinearOpMode {
     }
 
     //vv just arick messing around lol vv
-    private void moveAtAngle(double angle){
+    private void moveRobot(double moveAngle){
         double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
-        double relativeAngle = botHeading-angle;
+        double relativeAngle = botHeading-moveAngle;
         if(relativeAngle==Math.PI/2){
             frontLeftMotor.setPower(1);
             frontRightMotor.setPower(-1);
@@ -173,12 +173,12 @@ public class FieldCentricMecanumAutonomous extends LinearOpMode {
             double ratio = Math.tan(relativeAngle);
             double xPow;
             double yPow;
-            if (ratio <= 1) {
-                xPow = 1;
-                yPow = xPow * ratio;
+            if (Math.abs(ratio) <= 1) {
+                yPow = 1*ratio/Math.abs(ratio);
+                xPow = yPow * ratio;
             } else {
-                yPow = 1;
-                xPow = yPow * (1 / ratio);
+                xPow = 1*ratio/Math.abs(ratio);
+                yPow = xPow * (1 / ratio);
             }
             if (xPow > 0 && yPow > 0) {
                 frontLeftMotor.setPower(1);
