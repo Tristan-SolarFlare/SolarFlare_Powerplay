@@ -10,6 +10,7 @@ import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp
 public class FieldCentricMecanumTeleOp extends LinearOpMode {
@@ -21,6 +22,10 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
         double arm1pos = 0.02;
         double arm2pos = 0.02;
         double wristpos= 0.91;
+
+        ElapsedTime timer = new ElapsedTime(); //intialize timer for pid control
+
+        timer.reset(); //reset timer
 
         final double MOTOR_PPR = 145.1; // aka ticks per rotation
         final double TICKS_PER_CM = (int) Math.round(145.1 / 12);
@@ -85,6 +90,8 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
         // Set slides Kp value
         double Kp = 0.015;
 
+        double useTimer = 0; //0 = don't use timer calculation 1 = use timer for PID
+
         waitForStart();
 
         if (isStopRequested()) return;
@@ -119,6 +126,11 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
 
             double liftSpeed = 250; // ticks per second
 
+            if ((useTimer==1) && (timer.seconds() > 1)){
+                linearSlidesTarget = 0;
+                useTimer = 0;
+            }
+
             if (gamepad1.left_trigger>0.5) { // Checks for left bumper input, slows all motors by 50%
                 frontLeftPower = 0.5 * (rotY + rotX + rx) / denominator;
                 backLeftPower = 0.5 * (rotY - rotX + rx) / denominator;
@@ -126,10 +138,14 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
                 backRightPower = 0.5 * (rotY + rotX - rx) / denominator;
             }
             if (gamepad1.a){ // Reset to pickup position
-                linearSlidesTarget=0;
+                //linearSlidesTarget=0;
+                //SET LINEAR SLIDE TARGET DELAY
                 wristpos=0.91;
                 arm1pos=0.02;
                 arm2pos=0.02;
+                timer.reset(); //start counting time
+                useTimer = 1;
+
 
             }else if (gamepad1.b){ // Low junction
                 linearSlidesTarget=440; //rough estimate - we have to tune the encoder positions
