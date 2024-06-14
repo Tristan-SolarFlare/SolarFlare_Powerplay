@@ -92,7 +92,7 @@ public class FieldCentricMecanumAutonomous extends LinearOpMode {
     // Initialize default servo positions
     double arm1pos = 0.02;
     double arm2pos = 0.02;
-    double wristpos= 0.91;
+    double wristpos = 0.91;
 
     final double MOTOR_PPR = 145.1; // aka ticks per rotation
     final double TICKS_PER_CM = (int) Math.round(145.1 / 12);
@@ -110,13 +110,13 @@ public class FieldCentricMecanumAutonomous extends LinearOpMode {
 
     Servo wrist = hardwareMap.servo.get("wrist");
 
-    DcMotorEx slide1 = hardwareMap.get(DcMotorEx.class,"slide1");
-    DcMotorEx slide2 = hardwareMap.get(DcMotorEx.class,"slide2");
+    DcMotorEx slide1 = hardwareMap.get(DcMotorEx.class, "slide1");
+    DcMotorEx slide2 = hardwareMap.get(DcMotorEx.class, "slide2");
     // Retrieves the IMU from the hardware map
     IMU imu = hardwareMap.get(IMU.class, "imu");
 
     @Override
-    public void runOpMode(){
+    public void runOpMode() {
 
         // Orients motors to allow for forward movement
         frontRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -136,7 +136,7 @@ public class FieldCentricMecanumAutonomous extends LinearOpMode {
         // Without this, the REV Hub's orientation is assumed to be logo up / USB forward
         imu.initialize(parameters);
 
-        // Initalize slides
+        // Initialize slides
         slide1.setDirection(DcMotorSimple.Direction.REVERSE);
         slide2.setDirection(DcMotorSimple.Direction.FORWARD);
 
@@ -154,31 +154,29 @@ public class FieldCentricMecanumAutonomous extends LinearOpMode {
     }
 
     //vv just arick messing around lol vv
-    private void moveAtAngle(double angle){
+    private void moveRobot(double moveAngle) {
         double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
-        double relativeAngle = botHeading-angle;
-        if(relativeAngle==Math.PI/2){
+        double relativeAngle = botHeading - moveAngle;
+        if (relativeAngle == Math.PI / 2) {
             frontLeftMotor.setPower(1);
             frontRightMotor.setPower(-1);
             backRightMotor.setPower(1);
             backLeftMotor.setPower(-1);
-        }
-        else if(relativeAngle==-Math.PI/2){
+        } else if (relativeAngle == -Math.PI / 2) {
             frontLeftMotor.setPower(-1);
             frontRightMotor.setPower(1);
             backRightMotor.setPower(-1);
             backLeftMotor.setPower(1);
-        }
-        else {
+        } else {
             double ratio = Math.tan(relativeAngle);
             double xPow;
             double yPow;
-            if (ratio <= 1) {
-                xPow = 1;
-                yPow = xPow * ratio;
+            if (Math.abs(ratio) <= 1) {
+                yPow = 1 * ratio / Math.abs(ratio);
+                xPow = yPow * ratio;
             } else {
-                yPow = 1;
-                xPow = yPow * (1 / ratio);
+                xPow = 1 * ratio / Math.abs(ratio);
+                yPow = xPow * (1 / ratio);
             }
             if (xPow > 0 && yPow > 0) {
                 frontLeftMotor.setPower(1);
@@ -220,6 +218,26 @@ public class FieldCentricMecanumAutonomous extends LinearOpMode {
                     frontLeftMotor.setPower(yPow + 1);
                     backRightMotor.setPower(yPow + 1);
                 }
+            }
+        }
+    }
+    private void turnRobot(double turnAngle){
+        double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+        while (turnAngle != botHeading){
+            botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+            if(botHeading<0){
+                botHeading=360+botHeading;
+            }
+            if(Math.abs(botHeading-turnAngle)>=180){
+                frontRightMotor.setPower(1);
+                backRightMotor.setPower(1);
+                frontLeftMotor.setPower(-1);
+                backLeftMotor.setPower(-1);
+            } else{
+                frontRightMotor.setPower(-1);
+                backRightMotor.setPower(-1);
+                frontLeftMotor.setPower(1);
+                backLeftMotor.setPower(1);
             }
         }
     }
