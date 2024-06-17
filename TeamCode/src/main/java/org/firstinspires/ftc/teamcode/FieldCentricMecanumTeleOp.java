@@ -31,10 +31,10 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
         final double TICKS_PER_CM = (int) Math.round(145.1 / 12);
 
         // Maps motors and servos
-        DcMotor frontLeftMotor = hardwareMap.dcMotor.get("frontLeftMotor");
-        DcMotor backLeftMotor = hardwareMap.dcMotor.get("backLeftMotor");
-        DcMotor frontRightMotor = hardwareMap.dcMotor.get("frontRightMotor");
-        DcMotor backRightMotor = hardwareMap.dcMotor.get("backRightMotor");
+        DcMotor leftFront = hardwareMap.dcMotor.get("leftFront");
+        DcMotor leftBack = hardwareMap.dcMotor.get("leftBack");
+        DcMotor rightFront = hardwareMap.dcMotor.get("rightFront");
+        DcMotor rightBack = hardwareMap.dcMotor.get("rightBack");
 
         Servo arm1 = hardwareMap.servo.get("arm");
         Servo arm2 = hardwareMap.servo.get("arm2");
@@ -51,14 +51,14 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
         IMU imu = hardwareMap.get(IMU.class, "imu");
 
         // Orients motors to allow for forward movement
-        frontRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        backRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Ensures that when no power is set on the motors they will hold their position
-        frontLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        frontRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // Our robots logo direction and usb direction
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
@@ -100,7 +100,7 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
 
             double y = -gamepad1.left_stick_y; // y stick value should be reversed
             double x = gamepad1.left_stick_x;
-            double rx = gamepad1.right_stick_x;
+            double rx = -gamepad1.right_stick_x;
 
             // Will reset IMU in case of robot errors
             if (gamepad1.options) {
@@ -230,10 +230,10 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
             telemetry.update();
 
             // Set powers for driving
-            frontLeftMotor.setPower(frontLeftPower);
-            backLeftMotor.setPower(backLeftPower);
-            frontRightMotor.setPower(frontRightPower);
-            backRightMotor.setPower(backRightPower);
+            leftFront.setPower(frontLeftPower);
+            leftBack.setPower(backLeftPower);
+            rightFront.setPower(frontRightPower);
+            rightBack.setPower(backRightPower);
         }
     }
 }
