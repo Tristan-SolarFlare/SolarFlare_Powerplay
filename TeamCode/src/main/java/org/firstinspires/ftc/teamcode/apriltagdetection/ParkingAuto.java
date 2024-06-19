@@ -4,6 +4,7 @@
 
 package org.firstinspires.ftc.teamcode.apriltagdetection;
 
+import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -13,6 +14,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.apriltagdetection.AprilTagDetectionPipeline;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
@@ -33,12 +35,20 @@ import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.apriltag.AprilTagDetectorJNI;
 import org.openftc.apriltag.AprilTagPose;
 import org.openftc.easyopencv.OpenCvPipeline;
+import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.Vector2d;
+import com.acmerobotics.roadrunner.ftc.Actions;
+
 
 import java.util.ArrayList;
 
 @Autonomous
 
-public class AprilTagAutonomousDetection extends LinearOpMode
+public class ParkingAuto extends LinearOpMode
 {
 
     OpenCvCamera camera;
@@ -99,6 +109,24 @@ public class AprilTagAutonomousDetection extends LinearOpMode
          * The INIT-loop:
          * This REPLACES waitForStart!
          */
+        Action parkingZone1;
+        Action parkingZone2;
+        Action parkingZone3;
+
+        //set staring position, unit is inches
+        MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(10, 36, Math.toRadians(0)));
+
+        parkingZone1 = drive.actionBuilder(drive.pose)
+                .lineToX(50)
+                .splineToConstantHeading(new Vector2d(50, 60), (Math.PI / 2))
+                .build();
+        parkingZone2 = drive.actionBuilder(drive.pose)
+                .lineToX(50)
+                .build();
+        parkingZone3 = drive.actionBuilder(drive.pose)
+                .splineToConstantHeading(new Vector2d(50, 12), (Math.PI / 2))
+                .build();
+
         while (!isStarted() && !isStopRequested())
         {
             ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
@@ -178,19 +206,30 @@ public class AprilTagAutonomousDetection extends LinearOpMode
 
         // Performs actions based on tag detection
         // If the camera cannot find a tag, it will default to performing the left tag operation
+        waitForStart();
+
+        if (isStopRequested()) return;
+
+        Action trajectoryActionChosen = null  ;
+
         if(tagOfInterest == null){
 
         }
         if(tagOfInterest.id == leftTag){
             // Left tag code
-
+            trajectoryActionChosen = parkingZone1;
         }
         else if (tagOfInterest.id == middleTag){
-            // Middle tag code
+            trajectoryActionChosen = parkingZone2;
         }
         else if (tagOfInterest.id == rightTag){
-            // Right tag code
+            trajectoryActionChosen = parkingZone3;
         }
+        Actions.runBlocking(
+                new SequentialAction(
+                        trajectoryActionChosen
+                )
+        );
 
 
         while (opModeIsActive()) {sleep(20);}
