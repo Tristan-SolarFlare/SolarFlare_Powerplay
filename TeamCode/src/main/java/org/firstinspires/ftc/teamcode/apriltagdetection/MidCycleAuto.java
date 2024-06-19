@@ -4,10 +4,15 @@
 
 package org.firstinspires.ftc.teamcode.apriltagdetection;
 
+import androidx.appcompat.widget.VectorEnabledTintResources;
+
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.Vector2d;
+import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -15,40 +20,16 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
-import org.firstinspires.ftc.teamcode.apriltagdetection.AprilTagDetectionPipeline;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
-import org.openftc.easyopencv.OpenCvInternalCamera;
-import org.opencv.calib3d.Calib3d;
-import org.opencv.core.CvType;
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfDouble;
-import org.opencv.core.MatOfPoint2f;
-import org.opencv.core.MatOfPoint3f;
-import org.opencv.core.Point;
-import org.opencv.core.Point3;
-import org.opencv.core.Scalar;
-import org.opencv.imgproc.Imgproc;
-import org.openftc.apriltag.AprilTagDetection;
-import org.openftc.apriltag.AprilTagDetectorJNI;
-import org.openftc.apriltag.AprilTagPose;
-import org.openftc.easyopencv.OpenCvPipeline;
-import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-import com.acmerobotics.roadrunner.Action;
-import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.SequentialAction;
-import com.acmerobotics.roadrunner.Vector2d;
-import com.acmerobotics.roadrunner.ftc.Actions;
-
 
 import java.util.ArrayList;
 
 @Autonomous
 
-public class ParkingAuto extends LinearOpMode
+public class MidCycleAuto extends LinearOpMode
 {
 
     OpenCvCamera camera;
@@ -119,11 +100,61 @@ public class ParkingAuto extends LinearOpMode
         MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(10, 36, Math.toRadians(0)));
 
         parkingZone1 = drive.actionBuilder(drive.pose)
+                .strafeTo(new Vector2d(48,36))
+                .turn(Math.toRadians(90))
+                .waitSeconds(0.4)
+                .strafeTo(new Vector2d(60,36))
+                .strafeTo(new Vector2d(60, 14.5))
+                .waitSeconds(0.2)
+                .strafeTo(new Vector2d(56,38))
+                .turn(Math.toRadians(30))
+                .waitSeconds(0.4)
 
-                .lineToX(50)
-                .strafeTo(new Vector2d(50,60))
+                .turn(Math.toRadians(-30))
+                .strafeTo(new Vector2d(60,14.5))
+
+
+                .waitSeconds(0.2)
+                .strafeTo(new Vector2d(56,38))
+                .turn(Math.toRadians(30))
+
+                .waitSeconds(0.4)
+                .turn(Math.toRadians(-30))
+                .strafeTo(new Vector2d(60,14.5))
+
+                .waitSeconds(0.2)
+
+                .strafeTo(new Vector2d(56,38))
+                .turn(Math.toRadians(30))
+
+
+                .waitSeconds(0.4)
+
+                .turn(Math.toRadians(-30))
+
+                .strafeTo(new Vector2d(60,14.5))
+
+                .waitSeconds(0.2)
+
+                .strafeTo(new Vector2d(56,38))
+                .turn(Math.toRadians(30))
+
+                .waitSeconds(0.4)
+                .turn(Math.toRadians(-30))
+                .strafeTo(new Vector2d(60,14.5))
+
+                .waitSeconds(0.2)
+
+                .strafeTo(new Vector2d(56,38))
+                .turn(Math.toRadians(30))
+
+                .waitSeconds(0.4)
+
+                .strafeTo(new Vector2d(36,36))
+                .strafeTo(new Vector2d(36,60))
+
                 .build();
-        parkingZone2 = drive.actionBuilder(drive.pose)
+        parkingZone2 = drive.actionBuilder (drive.pose)
                 .lineToX(50)
                 .build();
         parkingZone3 = drive.actionBuilder(drive.pose)
