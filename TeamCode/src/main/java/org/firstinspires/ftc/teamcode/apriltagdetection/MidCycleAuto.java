@@ -154,7 +154,7 @@ public class MidCycleAuto extends LinearOpMode
                     // If error1 is greater than 80, correct by faster speed, else correct by usual speed
                     if ((Math.abs(error1)>80)){
                         slide1power = (0.75*error1);
-                    }
+                    }// hi
                     else {
                         slide1power = (Kp*error1);
                     }
