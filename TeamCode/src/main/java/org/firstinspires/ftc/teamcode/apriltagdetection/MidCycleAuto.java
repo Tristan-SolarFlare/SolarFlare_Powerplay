@@ -467,16 +467,24 @@ public class MidCycleAuto extends LinearOpMode
         Action trajectoryActionChosen = null  ;
 
         if(tagOfInterest == null){
+
+            // Runs autonomous and parks in zone 2
+            // Runs if camera does not detect april tag
             trajectoryActionChosen = parkingZone2;
         }
         if(tagOfInterest.id == leftTag){
-            // 
+
+            // Runs autonomous and parks in zone 1
             trajectoryActionChosen = parkingZone1;
         }
         else if (tagOfInterest.id == middleTag){
+
+            // Runs autonomous and parks in zone 2
             trajectoryActionChosen = parkingZone2;
         }
         else if (tagOfInterest.id == rightTag){
+
+            // Runs autonomous and parks in zone 3
             trajectoryActionChosen = parkingZone3;
         }
         Lift lift= new Lift();
