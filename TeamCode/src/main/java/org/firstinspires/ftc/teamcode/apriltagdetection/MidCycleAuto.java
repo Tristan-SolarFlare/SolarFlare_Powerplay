@@ -4,8 +4,10 @@
 
 package org.firstinspires.ftc.teamcode.apriltagdetection;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.widget.VectorEnabledTintResources;
-
+import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
@@ -13,6 +15,11 @@ import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -61,9 +68,76 @@ public class MidCycleAuto extends LinearOpMode
 
     AprilTagDetection tagOfInterest = null;
 
+    public class Lift {
+        private DcMotorEx slide1;
+        private DcMotorEx slide2;
+
+        public Lift(HardwareMap hardwareMap) {
+            DcMotorEx slide1 = hardwareMap.get(DcMotorEx.class,"slide1");
+            DcMotorEx slide2 = hardwareMap.get(DcMotorEx.class,"slide2");
+
+            slide1.setDirection(DcMotorSimple.Direction.REVERSE);
+            slide2.setDirection(DcMotorSimple.Direction.FORWARD);
+
+            // Ensures that when no power is set on the motors they will hold their position
+            slide1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            slide2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+            slide1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            slide2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+            slide1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            slide2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        }
+        // mid=120
+        // topcone=150
+        // second=120
+        // third=85
+        // fourth=40
+        // last=0
+
+        public class TopCone implements Action{
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet){
+                double Kp=0.015;
+                while (slide1.getCurrentPosition() <150 && slide2.getCurrentPosition() <150){
+                    double slide1power;
+                    // Calculates amount of ticks off slide1 is from target
+                    double error1=-(175-slide1.getCurrentPosition()); // Error is negative because slide1 needs to reverse direction
+
+                    // If error1 is greater than 80, correct by faster speed, else correct by usual speed
+                    if ((Math.abs(error1)>80)){
+                        slide1power = (0.75*error1);
+                    }
+                    else {
+                        slide1power = (Kp*error1);
+                    }
+                    slide1.setPower(slide1power);
+
+                    // We need a new slide2 power that will correct for error
+                    double slide2power;
+
+                    // Calculates amount of ticks off slide2 is from target
+                    double error2=175-slide2.getCurrentPosition();
+
+                    // If error1 is greater than 80, correct by faster speed, else correct by usual speed
+                    if ((Math.abs(error2)>80)){
+                        slide2power = 0.75*error2;
+                    }
+                    else {
+                        slide2power = Kp*error2;
+                    }
+                    slide2.setPower(slide2power);
+                }
+
+                return true;
+            }
+        }
+
+    }
+
     @Override
-    public void runOpMode()
-    {
+    public void runOpMode()    {
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
         aprilTagDetectionPipeline = new AprilTagDetectionPipeline(tagsize, fx, fy, cx, cy);
@@ -254,6 +328,8 @@ public class MidCycleAuto extends LinearOpMode
                 .build();
 
         boolean tagFound = false;
+
+
 
 
         waitForStart();
