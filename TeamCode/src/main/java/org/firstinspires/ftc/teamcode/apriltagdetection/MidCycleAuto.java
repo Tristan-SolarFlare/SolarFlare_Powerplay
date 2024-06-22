@@ -97,69 +97,160 @@ public class MidCycleAuto extends LinearOpMode
         Action parkingZone3;
 
         //set staring position, unit is inches
-        MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(10, 36, Math.toRadians(0)));
+        MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(11, 36, Math.toRadians(0)));
 
         parkingZone1 = drive.actionBuilder(drive.pose)
-                .strafeTo(new Vector2d(48,36))
                 .turn(Math.toRadians(90))
+
+                .strafeTo(new Vector2d(45,36))
                 .waitSeconds(0.4)
-                .strafeTo(new Vector2d(60,36))
-                .strafeTo(new Vector2d(60, 14.5))
+                .strafeTo(new Vector2d(57,36))
+                .strafeTo(new Vector2d(57, 12))
                 .waitSeconds(0.2)
-                .strafeTo(new Vector2d(56,38))
-                .turn(Math.toRadians(30))
+                .strafeToLinearHeading(new Vector2d(55,38),Math.toRadians(120))
                 .waitSeconds(0.4)
 
-                .turn(Math.toRadians(-30))
-                .strafeTo(new Vector2d(60,14.5))
+                .strafeToLinearHeading(new Vector2d(57,12),Math.toRadians(90))
 
-
-                .waitSeconds(0.2)
-                .strafeTo(new Vector2d(56,38))
-                .turn(Math.toRadians(30))
-
-                .waitSeconds(0.4)
-                .turn(Math.toRadians(-30))
-                .strafeTo(new Vector2d(60,14.5))
 
                 .waitSeconds(0.2)
-
-                .strafeTo(new Vector2d(56,38))
-                .turn(Math.toRadians(30))
+                .strafeToLinearHeading(new Vector2d(55,38),Math.toRadians(120))
 
 
                 .waitSeconds(0.4)
-
-                .turn(Math.toRadians(-30))
-
-                .strafeTo(new Vector2d(60,14.5))
+                .strafeToLinearHeading(new Vector2d(57,12),Math.toRadians(90))
 
                 .waitSeconds(0.2)
 
-                .strafeTo(new Vector2d(56,38))
-                .turn(Math.toRadians(30))
+                .strafeToLinearHeading(new Vector2d(55,38),Math.toRadians(120))
+
+
 
                 .waitSeconds(0.4)
-                .turn(Math.toRadians(-30))
-                .strafeTo(new Vector2d(60,14.5))
+
+                .strafeToLinearHeading(new Vector2d(57,12),Math.toRadians(90))
+
 
                 .waitSeconds(0.2)
 
-                .strafeTo(new Vector2d(56,38))
-                .turn(Math.toRadians(30))
+                .strafeToLinearHeading(new Vector2d(55,38),Math.toRadians(120))
+
 
                 .waitSeconds(0.4)
+                .strafeToLinearHeading(new Vector2d(57,12),Math.toRadians(90))
+
+
+                .waitSeconds(0.2)
+
+                .strafeToLinearHeading(new Vector2d(55,38),Math.toRadians(120))
+
+
+                .waitSeconds(0.4)
+                .turn(Math.toRadians(-120))
 
                 .strafeTo(new Vector2d(36,36))
                 .strafeTo(new Vector2d(36,60))
 
                 .build();
         parkingZone2 = drive.actionBuilder (drive.pose)
-                .lineToX(50)
+                .strafeTo(new Vector2d(48,36))
+                .turn(Math.toRadians(90))
+                .waitSeconds(0.4)
+                .strafeTo(new Vector2d(58.5,36))
+                .strafeTo(new Vector2d(58.5, 15))
+                .waitSeconds(0.2)
+                .strafeToLinearHeading(new Vector2d(48,36),Math.toRadians(120))
+                .waitSeconds(0.4)
+
+                .strafeToLinearHeading(new Vector2d(58.5,15),Math.toRadians(90))
+
+
+                .waitSeconds(0.2)
+                .strafeToLinearHeading(new Vector2d(56,38),Math.toRadians(120))
+
+
+                .waitSeconds(0.4)
+                .strafeToLinearHeading(new Vector2d(58.5,15),Math.toRadians(90))
+
+                .waitSeconds(0.2)
+
+                .strafeToLinearHeading(new Vector2d(56,38),Math.toRadians(120))
+
+
+
+                .waitSeconds(0.4)
+
+                .strafeToLinearHeading(new Vector2d(58.5,15),Math.toRadians(90))
+
+
+                .waitSeconds(0.2)
+
+                .strafeToLinearHeading(new Vector2d(56,38),Math.toRadians(120))
+
+
+                .waitSeconds(0.4)
+                .strafeToLinearHeading(new Vector2d(58.5,15),Math.toRadians(90))
+
+
+                .waitSeconds(0.2)
+
+                .strafeToLinearHeading(new Vector2d(56,38),Math.toRadians(120))
+
+
+                .waitSeconds(0.4)
+                .turn(Math.toRadians(-120))
                 .build();
         parkingZone3 = drive.actionBuilder(drive.pose)
-                .lineToX(50)
-                .strafeTo(new Vector2d(50,12))
+                .strafeTo(new Vector2d(48,36))
+                .turn(Math.toRadians(90))
+                .waitSeconds(0.4)
+                .strafeTo(new Vector2d(58.5,36))
+                .strafeTo(new Vector2d(58.5, 15))
+                .waitSeconds(0.2)
+                .strafeToLinearHeading(new Vector2d(48,36),Math.toRadians(120))
+                .waitSeconds(0.4)
+
+                .strafeToLinearHeading(new Vector2d(58.5,15),Math.toRadians(90))
+
+
+                .waitSeconds(0.2)
+                .strafeToLinearHeading(new Vector2d(56,38),Math.toRadians(120))
+
+
+                .waitSeconds(0.4)
+                .strafeToLinearHeading(new Vector2d(58.5,15),Math.toRadians(90))
+
+                .waitSeconds(0.2)
+
+                .strafeToLinearHeading(new Vector2d(56,38),Math.toRadians(120))
+
+
+
+                .waitSeconds(0.4)
+
+                .strafeToLinearHeading(new Vector2d(58.5,15),Math.toRadians(90))
+
+
+                .waitSeconds(0.2)
+
+                .strafeToLinearHeading(new Vector2d(56,38),Math.toRadians(120))
+
+
+                .waitSeconds(0.4)
+                .strafeToLinearHeading(new Vector2d(58.5,15),Math.toRadians(90))
+
+
+                .waitSeconds(0.2)
+
+                .strafeToLinearHeading(new Vector2d(56,38),Math.toRadians(120))
+
+
+                .waitSeconds(0.4)
+                .turn(Math.toRadians(-120))
+
+                .strafeTo(new Vector2d(36,36))
+                .strafeTo(new Vector2d(36,12))
+
                 .build();
 
         boolean tagFound = false;

@@ -16,11 +16,8 @@ public class MeepMeepTesting {
                 .build();
 
         myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(0, 0, 0))
-                .splineToLinearHeading(new Pose2d(50,50,Math.toRadians(90)),Math.toRadians(0))
-                .splineToLinearHeading(new Pose2d(0,0,Math.toRadians(0)),Math.toRadians(0))
-
-
-
+                .strafeToLinearHeading(new Vector2d(48,36),Math.PI/2)
+                .strafeToLinearHeading(new Vector2d(0,0),0)
                 .build());
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_POWERPLAY_OFFICIAL)
