@@ -18,7 +18,7 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-        // Initialize default servo po sitions
+        // Initialize default servo positions
         double arm1pos = 0.02;
         double arm2pos = 0.02;
         double wristpos= 0.91;
@@ -126,12 +126,12 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
 
             double liftSpeed = 250; // ticks per second
 
-            if ((useTimer==1) && (timer.seconds() > 1)){
+            if ((useTimer==1) && (timer.seconds() > 0.5)){
                 linearSlidesTarget = 0;
                 useTimer = 0;
             }
 
-            if (gamepad1.left_trigger>0.5) { // Checks for left bumper input, slows all motors by 50%
+            if (gamepad1.left_trigger>0.5) { // Checks for left trigger input, slows all motors by 50%
                 frontLeftPower = 0.5 * (rotY + rotX + rx) / denominator;
                 backLeftPower = 0.5 * (rotY - rotX + rx) / denominator;
                 frontRightPower = 0.5 * (rotY - rotX - rx) / denominator;

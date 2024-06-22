@@ -102,42 +102,41 @@ public class MidCycleAuto extends LinearOpMode
         parkingZone1 = drive.actionBuilder(drive.pose)
                 .turn(Math.toRadians(90))
 
-                .strafeTo(new Vector2d(45,36))
+                .strafeTo(new Vector2d(45, 36))
                 .waitSeconds(0.4)
-                .strafeTo(new Vector2d(57,36))
-                .strafeTo(new Vector2d(57, 12))
+                .strafeTo(new Vector2d(57, 36))
+                .strafeTo(new Vector2d(56.5, 12))
                 .waitSeconds(0.2)
-                .strafeToLinearHeading(new Vector2d(55,38),Math.toRadians(120))
+                .strafeToLinearHeading(new Vector2d(55, 38), Math.toRadians(120))
                 .waitSeconds(0.4)
 
-                .strafeToLinearHeading(new Vector2d(57,12),Math.toRadians(90))
-
-
-                .waitSeconds(0.2)
-                .strafeToLinearHeading(new Vector2d(55,38),Math.toRadians(120))
-
-
-                .waitSeconds(0.4)
-                .strafeToLinearHeading(new Vector2d(57,12),Math.toRadians(90))
-
-                .waitSeconds(0.2)
-
-                .strafeToLinearHeading(new Vector2d(55,38),Math.toRadians(120))
-
-
-
-                .waitSeconds(0.4)
-
-                .strafeToLinearHeading(new Vector2d(57,12),Math.toRadians(90))
+                .strafeToLinearHeading(new Vector2d(56, 12), Math.toRadians(90))
 
 
                 .waitSeconds(0.2)
-
-                .strafeToLinearHeading(new Vector2d(55,38),Math.toRadians(120))
+                .strafeToLinearHeading(new Vector2d(55, 38), Math.toRadians(120))
 
 
                 .waitSeconds(0.4)
-                .strafeToLinearHeading(new Vector2d(57,12),Math.toRadians(90))
+                .strafeToLinearHeading(new Vector2d(56, 12), Math.toRadians(90))
+
+                .waitSeconds(0.2)
+
+                .strafeToLinearHeading(new Vector2d(55, 38), Math.toRadians(120))
+
+
+                .waitSeconds(0.4)
+
+                .strafeToLinearHeading(new Vector2d(55, 12), Math.toRadians(90))
+
+
+                .waitSeconds(0.2)
+
+                .strafeToLinearHeading(new Vector2d(55, 38), Math.toRadians(120))
+
+
+                .waitSeconds(0.4)
+                .strafeToLinearHeading(new Vector2d(55, 12), Math.toRadians(90))
 
 
                 .waitSeconds(0.2)
@@ -153,96 +152,97 @@ public class MidCycleAuto extends LinearOpMode
 
                 .build();
         parkingZone2 = drive.actionBuilder (drive.pose)
-                .strafeTo(new Vector2d(48,36))
                 .turn(Math.toRadians(90))
+
+                .strafeTo(new Vector2d(45, 36))
                 .waitSeconds(0.4)
-                .strafeTo(new Vector2d(58.5,36))
-                .strafeTo(new Vector2d(58.5, 15))
+                .strafeTo(new Vector2d(57, 36))
+                .strafeTo(new Vector2d(56.5, 12))
                 .waitSeconds(0.2)
-                .strafeToLinearHeading(new Vector2d(48,36),Math.toRadians(120))
+                .strafeToLinearHeading(new Vector2d(55, 38), Math.toRadians(120))
                 .waitSeconds(0.4)
 
-                .strafeToLinearHeading(new Vector2d(58.5,15),Math.toRadians(90))
-
-
-                .waitSeconds(0.2)
-                .strafeToLinearHeading(new Vector2d(56,38),Math.toRadians(120))
-
-
-                .waitSeconds(0.4)
-                .strafeToLinearHeading(new Vector2d(58.5,15),Math.toRadians(90))
-
-                .waitSeconds(0.2)
-
-                .strafeToLinearHeading(new Vector2d(56,38),Math.toRadians(120))
-
-
-
-                .waitSeconds(0.4)
-
-                .strafeToLinearHeading(new Vector2d(58.5,15),Math.toRadians(90))
+                .strafeToLinearHeading(new Vector2d(56, 12), Math.toRadians(90))
 
 
                 .waitSeconds(0.2)
-
-                .strafeToLinearHeading(new Vector2d(56,38),Math.toRadians(120))
+                .strafeToLinearHeading(new Vector2d(55, 38), Math.toRadians(120))
 
 
                 .waitSeconds(0.4)
-                .strafeToLinearHeading(new Vector2d(58.5,15),Math.toRadians(90))
+                .strafeToLinearHeading(new Vector2d(56, 12), Math.toRadians(90))
+
+                .waitSeconds(0.2)
+
+                .strafeToLinearHeading(new Vector2d(55, 38), Math.toRadians(120))
+
+
+                .waitSeconds(0.4)
+
+                .strafeToLinearHeading(new Vector2d(55, 12), Math.toRadians(90))
 
 
                 .waitSeconds(0.2)
 
-                .strafeToLinearHeading(new Vector2d(56,38),Math.toRadians(120))
+                .strafeToLinearHeading(new Vector2d(55, 38), Math.toRadians(120))
+
+
+                .waitSeconds(0.4)
+                .strafeToLinearHeading(new Vector2d(55, 12), Math.toRadians(90))
+
+
+                .waitSeconds(0.2)
+
+                .strafeToLinearHeading(new Vector2d(55,38),Math.toRadians(120))
 
 
                 .waitSeconds(0.4)
                 .turn(Math.toRadians(-120))
+
                 .build();
         parkingZone3 = drive.actionBuilder(drive.pose)
-                .strafeTo(new Vector2d(48,36))
                 .turn(Math.toRadians(90))
+
+                .strafeTo(new Vector2d(45, 36))
                 .waitSeconds(0.4)
-                .strafeTo(new Vector2d(58.5,36))
-                .strafeTo(new Vector2d(58.5, 15))
+                .strafeTo(new Vector2d(57, 36))
+                .strafeTo(new Vector2d(56.5, 12))
                 .waitSeconds(0.2)
-                .strafeToLinearHeading(new Vector2d(48,36),Math.toRadians(120))
+                .strafeToLinearHeading(new Vector2d(55, 38), Math.toRadians(120))
                 .waitSeconds(0.4)
 
-                .strafeToLinearHeading(new Vector2d(58.5,15),Math.toRadians(90))
-
-
-                .waitSeconds(0.2)
-                .strafeToLinearHeading(new Vector2d(56,38),Math.toRadians(120))
-
-
-                .waitSeconds(0.4)
-                .strafeToLinearHeading(new Vector2d(58.5,15),Math.toRadians(90))
-
-                .waitSeconds(0.2)
-
-                .strafeToLinearHeading(new Vector2d(56,38),Math.toRadians(120))
-
-
-
-                .waitSeconds(0.4)
-
-                .strafeToLinearHeading(new Vector2d(58.5,15),Math.toRadians(90))
+                .strafeToLinearHeading(new Vector2d(56, 12), Math.toRadians(90))
 
 
                 .waitSeconds(0.2)
-
-                .strafeToLinearHeading(new Vector2d(56,38),Math.toRadians(120))
+                .strafeToLinearHeading(new Vector2d(55, 38), Math.toRadians(120))
 
 
                 .waitSeconds(0.4)
-                .strafeToLinearHeading(new Vector2d(58.5,15),Math.toRadians(90))
+                .strafeToLinearHeading(new Vector2d(56, 12), Math.toRadians(90))
+
+                .waitSeconds(0.2)
+
+                .strafeToLinearHeading(new Vector2d(55, 38), Math.toRadians(120))
+
+
+                .waitSeconds(0.4)
+
+                .strafeToLinearHeading(new Vector2d(55, 12), Math.toRadians(90))
 
 
                 .waitSeconds(0.2)
 
-                .strafeToLinearHeading(new Vector2d(56,38),Math.toRadians(120))
+                .strafeToLinearHeading(new Vector2d(55, 38), Math.toRadians(120))
+
+
+                .waitSeconds(0.4)
+                .strafeToLinearHeading(new Vector2d(55, 12), Math.toRadians(90))
+
+
+                .waitSeconds(0.2)
+
+                .strafeToLinearHeading(new Vector2d(55,38),Math.toRadians(120))
 
 
                 .waitSeconds(0.4)
