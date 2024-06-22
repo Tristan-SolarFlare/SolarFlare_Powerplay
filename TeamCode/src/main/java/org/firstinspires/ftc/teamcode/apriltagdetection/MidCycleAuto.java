@@ -344,7 +344,7 @@ public class MidCycleAuto extends LinearOpMode
         Action trajectoryActionChosen = null  ;
 
         if(tagOfInterest == null){
-
+            trajectoryActionChosen = parkingZone2;
         }
         if(tagOfInterest.id == leftTag){
             // Left tag code
