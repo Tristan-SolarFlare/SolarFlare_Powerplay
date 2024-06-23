@@ -34,6 +34,8 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import java.util.ArrayList;
 
+import kotlin.math.UMathKt;
+
 @Autonomous
 
 public class MidCycleAuto extends LinearOpMode
@@ -738,172 +740,57 @@ public class MidCycleAuto extends LinearOpMode
          * This REPLACES waitForStart!
          */
 
+        Action DriveInitialDeposit;
+        Action DriveToIntakeFromInitialDeposit;
+        Action DriveToIntake;
+        Action DriveToDeposit;
+        Action ParkZone1;
+        Action ParkZone2;
+        Action ParkZone3;
 
-        Action parkingZone1;
-        Action parkingZone2;
-        Action parkingZone3;
 
         //set staring position, unit is inches
         MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(11, 36, Math.toRadians(0)));
 
-        parkingZone1 = drive.actionBuilder(drive.pose)
+        DriveInitialDeposit = drive.actionBuilder(drive.pose)
                 .turn(Math.toRadians(90))
-
-                .strafeTo(new Vector2d(45, 36))
+                .strafeTo(new Vector2d(45,36))
                 .waitSeconds(0.4)
-                .strafeTo(new Vector2d(57, 36))
-                .strafeTo(new Vector2d(56.5, 12))
+                .build();
+
+        DriveToIntakeFromInitialDeposit = drive.actionBuilder(drive.pose)
+                .strafeTo(new Vector2d(57,36))
+                .strafeTo(new Vector2d(56.5,12))
                 .waitSeconds(0.2)
-                .strafeToLinearHeading(new Vector2d(55, 38), Math.toRadians(120))
-                .waitSeconds(0.4)
+                .build();
 
-                .strafeToLinearHeading(new Vector2d(56, 12), Math.toRadians(90))
-
-
+        DriveToIntake = drive.actionBuilder(drive.pose)
+                .strafeToLinearHeading(new Vector2d(56,12),Math.toRadians(90))
                 .waitSeconds(0.2)
-                .strafeToLinearHeading(new Vector2d(55, 38), Math.toRadians(120))
+                .build();
 
-
-                .waitSeconds(0.4)
-                .strafeToLinearHeading(new Vector2d(56, 12), Math.toRadians(90))
-
-                .waitSeconds(0.2)
-
-                .strafeToLinearHeading(new Vector2d(55, 38), Math.toRadians(120))
-
-
-                .waitSeconds(0.4)
-
-                .strafeToLinearHeading(new Vector2d(55, 12), Math.toRadians(90))
-
-
-                .waitSeconds(0.2)
-
-                .strafeToLinearHeading(new Vector2d(55, 38), Math.toRadians(120))
-
-
-                .waitSeconds(0.4)
-                .strafeToLinearHeading(new Vector2d(55, 12), Math.toRadians(90))
-
-
-                .waitSeconds(0.2)
-
+        DriveToDeposit = drive.actionBuilder(drive.pose)
                 .strafeToLinearHeading(new Vector2d(55,38),Math.toRadians(120))
-
-
                 .waitSeconds(0.4)
-                .turn(Math.toRadians(-120))
+                .build();
 
+        ParkZone1 = drive.actionBuilder(drive.pose)
+                .turn(Math.toRadians(-120))
                 .strafeTo(new Vector2d(36,36))
                 .strafeTo(new Vector2d(36,60))
-
                 .build();
-        parkingZone2 = drive.actionBuilder (drive.pose)
-                .turn(Math.toRadians(90))
 
-                .strafeTo(new Vector2d(45, 36))
-                .waitSeconds(0.4)
-                .strafeTo(new Vector2d(57, 36))
-                .strafeTo(new Vector2d(56.5, 12))
-                .waitSeconds(0.2)
-                .strafeToLinearHeading(new Vector2d(55, 38), Math.toRadians(120))
-                .waitSeconds(0.4)
-
-                .strafeToLinearHeading(new Vector2d(56, 12), Math.toRadians(90))
-
-
-                .waitSeconds(0.2)
-                .strafeToLinearHeading(new Vector2d(55, 38), Math.toRadians(120))
-
-
-                .waitSeconds(0.4)
-                .strafeToLinearHeading(new Vector2d(56, 12), Math.toRadians(90))
-
-                .waitSeconds(0.2)
-
-                .strafeToLinearHeading(new Vector2d(55, 38), Math.toRadians(120))
-
-
-                .waitSeconds(0.4)
-
-                .strafeToLinearHeading(new Vector2d(55, 12), Math.toRadians(90))
-
-
-                .waitSeconds(0.2)
-
-                .strafeToLinearHeading(new Vector2d(55, 38), Math.toRadians(120))
-
-
-                .waitSeconds(0.4)
-                .strafeToLinearHeading(new Vector2d(55, 12), Math.toRadians(90))
-
-
-                .waitSeconds(0.2)
-
-                .strafeToLinearHeading(new Vector2d(55,38),Math.toRadians(120))
-
-
-                .waitSeconds(0.4)
+        ParkZone2 = drive.actionBuilder(drive.pose)
                 .turn(Math.toRadians(-120))
-
                 .build();
-        parkingZone3 = drive.actionBuilder(drive.pose)
-                .turn(Math.toRadians(90))
 
-                .strafeTo(new Vector2d(45, 36))
-                .waitSeconds(0.4)
-                .strafeTo(new Vector2d(57, 36))
-                .strafeTo(new Vector2d(56.5, 12))
-                .waitSeconds(0.2)
-                .strafeToLinearHeading(new Vector2d(55, 38), Math.toRadians(120))
-                .waitSeconds(0.4)
-
-                .strafeToLinearHeading(new Vector2d(56, 12), Math.toRadians(90))
-
-
-                .waitSeconds(0.2)
-                .strafeToLinearHeading(new Vector2d(55, 38), Math.toRadians(120))
-
-
-                .waitSeconds(0.4)
-                .strafeToLinearHeading(new Vector2d(56, 12), Math.toRadians(90))
-
-                .waitSeconds(0.2)
-
-                .strafeToLinearHeading(new Vector2d(55, 38), Math.toRadians(120))
-
-
-                .waitSeconds(0.4)
-
-                .strafeToLinearHeading(new Vector2d(55, 12), Math.toRadians(90))
-
-
-                .waitSeconds(0.2)
-
-                .strafeToLinearHeading(new Vector2d(55, 38), Math.toRadians(120))
-
-
-                .waitSeconds(0.4)
-                .strafeToLinearHeading(new Vector2d(55, 12), Math.toRadians(90))
-
-
-                .waitSeconds(0.2)
-
-                .strafeToLinearHeading(new Vector2d(55,38),Math.toRadians(120))
-
-
-                .waitSeconds(0.4)
+        ParkZone3 = drive.actionBuilder(drive.pose)
                 .turn(Math.toRadians(-120))
-
                 .strafeTo(new Vector2d(36,36))
                 .strafeTo(new Vector2d(36,12))
-
                 .build();
 
         boolean tagFound = false;
-
-
-
 
         waitForStart();
 
@@ -996,22 +883,22 @@ public class MidCycleAuto extends LinearOpMode
 
             // Runs autonomous and parks in zone 2
             // Runs if camera does not detect april tag
-            trajectoryActionChosen = parkingZone2;
+            trajectoryActionChosen = ParkZone2;
         }
         if(tagOfInterest.id == leftTag){
 
             // Runs autonomous and parks in zone 1
-            trajectoryActionChosen = parkingZone1;
+            trajectoryActionChosen = ParkZone1;
         }
         else if (tagOfInterest.id == middleTag){
 
             // Runs autonomous and parks in zone 2
-            trajectoryActionChosen = parkingZone2;
+            trajectoryActionChosen = ParkZone2;
         }
         else if (tagOfInterest.id == rightTag){
 
             // Runs autonomous and parks in zone 3
-            trajectoryActionChosen = parkingZone3;
+            trajectoryActionChosen = ParkZone3;
         }
         Lift lift= new Lift();
         Actions.runBlocking(
