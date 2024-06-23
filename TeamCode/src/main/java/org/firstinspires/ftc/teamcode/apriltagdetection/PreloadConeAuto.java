@@ -267,6 +267,7 @@ public class PreloadConeAuto extends LinearOpMode
 
         public class CloseClaw implements Action {
             @Override
+
             public boolean run(@NonNull TelemetryPacket packet) {
                 DcMotorEx slide1 = hardwareMap.get(DcMotorEx.class, "slide1");
                 DcMotorEx slide2 = hardwareMap.get(DcMotorEx.class, "slide2");

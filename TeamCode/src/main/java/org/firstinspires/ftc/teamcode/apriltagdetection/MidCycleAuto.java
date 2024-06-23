@@ -11,6 +11,7 @@ import androidx.appcompat.widget.VectorEnabledTintResources;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.Vector2d;
@@ -79,6 +80,8 @@ public class MidCycleAuto extends LinearOpMode
         // third=85
         // fourth=40
         // last=0
+
+        //NOTE: UPDATE TIMING ACCORDINGLY LATER
         public class Grab1Cone implements Action {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
@@ -684,6 +687,44 @@ public class MidCycleAuto extends LinearOpMode
             }
         }
 
+        public class OpenClaw implements Action {
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                DcMotorEx slide1 = hardwareMap.get(DcMotorEx.class, "slide1");
+                DcMotorEx slide2 = hardwareMap.get(DcMotorEx.class, "slide2");
+
+                slide1.setDirection(DcMotorSimple.Direction.REVERSE);
+                slide2.setDirection(DcMotorSimple.Direction.FORWARD);
+
+                // Ensures that when no power is set on the motors they will hold their position
+                slide1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                slide2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+                slide1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                slide2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+                Servo arm1 = hardwareMap.servo.get("arm");
+                Servo arm2 = hardwareMap.servo.get("arm2");
+
+                arm1.setDirection(Servo.Direction.REVERSE);
+
+
+                Servo claw = hardwareMap.servo.get("claw");
+
+                Servo wrist = hardwareMap.servo.get("wrist");
+                telemetry.addData("Slide1 Position", slide1.getCurrentPosition());
+                telemetry.addData("Slide2 Position", slide1.getCurrentPosition());
+                telemetry.update();
+
+                claw.setPosition(0);
+
+                sleep(1000 );
+
+
+                return false;
+            }
+        }
+
         public class CloseClaw implements Action {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
@@ -748,6 +789,10 @@ public class MidCycleAuto extends LinearOpMode
         public Action CloseClaw() {
             return new CloseClaw();
 
+        }
+
+        public Action OpenClaw(){
+            return new OpenClaw();
         }
         
     }
@@ -960,9 +1005,17 @@ public class MidCycleAuto extends LinearOpMode
         }
         Lift lift= new Lift();
         Actions.runBlocking(
-                new SequentialAction(
-                        lift.Grab1Cone()
+                new ParallelAction(
+                    DriveInitialDeposit,
+                    lift.DepositPosition(),
+                    lift.OpenClaw(),
+                    DriveToIntakeFromInitialDeposit,
+                    lift.Grab5Cone(),
+                    lift.DepositPosition(),
+                    lift.OpenClaw()
 
+                        //I JUST REALIZED THIS IS WRONG, WILL BE ADDING DIFFERENT SEQUENCES LATER
+                        
                 )
         );
 
