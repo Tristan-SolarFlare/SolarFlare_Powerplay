@@ -183,49 +183,7 @@ public class MidCycleAuto extends LinearOpMode
                     telemetry.addData("Slide2 Position", slide1.getCurrentPosition());
                     telemetry.update();
                 }
-                /*
-
-                arm1.setPosition(0.96);
-                arm1.setPosition(0.96);
-                wrist.setPosition(0.2);
-
-                sleep(1000);
-
-
-                target = 140;
-                while (Math.abs(slide1.getCurrentPosition()-target)>20 && Math.abs(slide2.getCurrentPosition()-target)>20){
-                    double slide1power;
-                    // Calculates amount of ticks off slide1 is from target
-                    double error1=-(target-slide1.getCurrentPosition()); // Error is negative because slide1 needs to reverse direction
-
-                    // If error1 is greater than 80, correct by faster speed, else correct by usual speed
-                    if ((Math.abs(error1)>80)){
-                        slide1power = (0.75*error1);
-                    }
-                    else {
-                        slide1power = (Kp*error1);
-                    }
-                    slide1.setPower(slide1power);
-
-                    // We need a new slide2 power that will correct for error
-                    double slide2power;
-
-                    // Calculates amount of ticks off slide2 is from target
-                    double error2=target-slide2.getCurrentPosition();
-
-                    // If error1 is greater than 80, correct by faster speed, else correct by usual speed
-                    if ((Math.abs(error2)>80)){
-                        slide2power = 0.75*error2;
-                    }
-                    else {
-                        slide2power = Kp*error2;
-                    }
-                    slide2.setPower(slide2power);
-                    telemetry.addData("Slide1 Position", slide1.getCurrentPosition());
-                    telemetry.addData("Slide2 Position", slide1.getCurrentPosition());
-                    telemetry.update();
-                }
-                 */
+                
 
 
                 return false;
