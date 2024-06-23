@@ -688,7 +688,7 @@ public class MidCycleAuto extends LinearOpMode
         }
         public Action Cone5(){
             return new Grab3Cone();
-        } 
+        }
 
     }
 
