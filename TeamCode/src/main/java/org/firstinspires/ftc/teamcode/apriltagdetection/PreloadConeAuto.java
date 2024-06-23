@@ -150,7 +150,82 @@ public class PreloadConeAuto extends LinearOpMode
                 return false;
             }
         }
-        
+
+        public class RetractionSequence implements Action {
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                DcMotorEx slide1 = hardwareMap.get(DcMotorEx.class, "slide1");
+                DcMotorEx slide2 = hardwareMap.get(DcMotorEx.class, "slide2");
+
+                slide1.setDirection(DcMotorSimple.Direction.REVERSE);
+                slide2.setDirection(DcMotorSimple.Direction.FORWARD);
+
+                // Ensures that when no power is set on the motors they will hold their position
+                slide1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                slide2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+                slide1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                slide2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+                Servo arm1 = hardwareMap.servo.get("arm");
+                Servo arm2 = hardwareMap.servo.get("arm2");
+
+                arm1.setDirection(Servo.Direction.REVERSE);
+
+
+                Servo claw = hardwareMap.servo.get("claw");
+
+                Servo wrist = hardwareMap.servo.get("wrist");
+                telemetry.addData("Slide1 Position", slide1.getCurrentPosition());
+                telemetry.addData("Slide2 Position", slide1.getCurrentPosition());
+                telemetry.update();
+
+                double Kp = 0.015;
+                double target;
+                sleep(1500);
+                arm1.setPosition(0.02);
+                arm2.setPosition(0.02);
+                wrist.setPosition(0.91);
+                sleep(600);
+                claw.setPosition(0);
+                target = 0;
+                while (Math.abs(slide1.getCurrentPosition() - target) > 5 || Math.abs(slide2.getCurrentPosition() - target) > 5) {
+                    double slide1power;
+                    // Calculates amount of ticks off slide1 is from target
+                    double error1 = -(target - slide1.getCurrentPosition()); // Error is negative because slide1 needs to reverse direction
+
+                    // If error1 is greater than 80, correct by faster speed, else correct by usual speed
+                    if ((Math.abs(error1) > 80)) {
+                        slide1power = (0.75 * error1);
+                    } else {
+                        slide1power = (Kp * error1);
+                    }
+                    slide1.setPower(slide1power);
+
+                    // We need a new slide2 power that will correct for error
+                    double slide2power;
+
+                    // Calculates amount of ticks off slide2 is from target
+                    double error2 = target - slide2.getCurrentPosition();
+
+                    // If error1 is greater than 80, correct by faster speed, else correct by usual speed
+                    if ((Math.abs(error2) > 80)) {
+                        slide2power = 0.75 * error2;
+                    } else {
+                        slide2power = Kp * error2;
+                    }
+                    slide2.setPower(slide2power);
+
+                    telemetry.addData("Slide1 Position", slide1.getCurrentPosition());
+                    telemetry.addData("Slide2 Position", slide1.getCurrentPosition());
+                    telemetry.update();
+
+                }
+                sleep(1000);
+                return false;
+            }
+        }
+
 
         public class OpenClaw implements Action {
             @Override
@@ -219,6 +294,8 @@ public class PreloadConeAuto extends LinearOpMode
                 telemetry.addData("Slide2 Position", slide1.getCurrentPosition());
                 telemetry.update();
 
+                wrist.setPosition(0.91);
+
                 claw.setPosition(0.3);
 
 
@@ -239,7 +316,10 @@ public class PreloadConeAuto extends LinearOpMode
             return new CloseClaw();
 
         }
-        
+
+        public Action RetractionSequence(){
+            return new RetractionSequence();
+        }
     }
 
     @Override
@@ -302,24 +382,25 @@ public class PreloadConeAuto extends LinearOpMode
 
         DriveInitialDeposit = drive.actionBuilder(drive.pose)
                 .strafeTo(new Vector2d(11,72))
-                .strafeTo(new Vector2d(38,72))
+                .strafeTo(new Vector2d(36,72))
                 .waitSeconds(0.4)
                 .build();
 
         ParkZone1 = drive.actionBuilder(drive.pose)
-                .strafeTo(new Vector2d(18,60))
+                .strafeTo(new Vector2d(11,72))
+                .strafeTo(new Vector2d(11,60))
                 .strafeTo(new Vector2d(36,60))
                 .build();
 
         ParkZone2 = drive.actionBuilder(drive.pose)
-                .strafeTo(new Vector2d(18,36))
+                .strafeTo(new Vector2d(11,72))
+                .strafeTo(new Vector2d(11,36))
                 .strafeTo(new Vector2d(36,36))
-
                 .build();
 
         ParkZone3 = drive.actionBuilder(drive.pose)
-                .turn(Math.toRadians(-120))
-                .strafeTo(new Vector2d(18,12))
+                .strafeTo(new Vector2d(11,72))
+                .strafeTo(new Vector2d(11,12))
                 .strafeTo(new Vector2d(36,12))
                 .build();
 
@@ -440,6 +521,7 @@ public class PreloadConeAuto extends LinearOpMode
                         DriveInitialDeposit,
                         lift.DepositPosition(),
                         lift.OpenClaw(),
+                        lift.RetractionSequence(),
                         trajectoryActionChosen
                 )
         );
