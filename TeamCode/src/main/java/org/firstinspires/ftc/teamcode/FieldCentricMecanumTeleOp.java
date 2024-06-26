@@ -130,7 +130,7 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
 
             double liftSpeed = 250; // ticks per second
 
-            if ((useTimer==1) && (timer.seconds() > 0.5)){
+            if ((useTimer==1) && (timer.seconds() > 0.7)){
                 linearSlidesTarget = 0;
                 useTimer = 0;
             }
