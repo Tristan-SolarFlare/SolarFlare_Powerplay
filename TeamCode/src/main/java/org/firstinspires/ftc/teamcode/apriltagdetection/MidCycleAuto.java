@@ -117,7 +117,7 @@ public class MidCycleAuto extends LinearOpMode
                 arm2.setPosition(0.02);
                 wrist.setPosition(0.91);
                 claw.setPosition(0);
-                sleep(700);
+                sleep(2000);
                 target = 170;
                 while (Math.abs(slide1.getCurrentPosition() - target) > 20 && Math.abs(slide2.getCurrentPosition() - target) > 20) {
                     double slide1power;
@@ -303,10 +303,10 @@ public class MidCycleAuto extends LinearOpMode
                 telemetry.addData("Slide1 Position", slide1.getCurrentPosition());
                 telemetry.addData("Slide2 Position", slide1.getCurrentPosition());
                 telemetry.update();
-                sleep(400 );
 
                 claw.setPosition(0);
 
+                sleep(1000 );
 
 
                 return false;
@@ -349,6 +349,81 @@ public class MidCycleAuto extends LinearOpMode
             }
         }
 
+        public class RetractionSequence implements Action {
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                DcMotorEx slide1 = hardwareMap.get(DcMotorEx.class, "slide1");
+                DcMotorEx slide2 = hardwareMap.get(DcMotorEx.class, "slide2");
+
+                slide1.setDirection(DcMotorSimple.Direction.REVERSE);
+                slide2.setDirection(DcMotorSimple.Direction.FORWARD);
+
+                // Ensures that when no power is set on the motors they will hold their position
+                slide1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                slide2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+                slide1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                slide2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+                Servo arm1 = hardwareMap.servo.get("arm");
+                Servo arm2 = hardwareMap.servo.get("arm2");
+
+                arm1.setDirection(Servo.Direction.REVERSE);
+
+
+                Servo claw = hardwareMap.servo.get("claw");
+
+                Servo wrist = hardwareMap.servo.get("wrist");
+                telemetry.addData("Slide1 Position", slide1.getCurrentPosition());
+                telemetry.addData("Slide2 Position", slide1.getCurrentPosition());
+                telemetry.update();
+
+                double Kp = 0.015;
+                double target;
+                sleep(1500);
+                arm1.setPosition(0.02);
+                arm2.setPosition(0.02);
+                wrist.setPosition(0.91);
+                sleep(600);
+                claw.setPosition(0);
+                target = 0;
+                while (Math.abs(slide1.getCurrentPosition() - target) > 5 || Math.abs(slide2.getCurrentPosition() - target) > 5) {
+                    double slide1power;
+                    // Calculates amount of ticks off slide1 is from target
+                    double error1 = -(target - slide1.getCurrentPosition()); // Error is negative because slide1 needs to reverse direction
+
+                    // If error1 is greater than 80, correct by faster speed, else correct by usual speed
+                    if ((Math.abs(error1) > 80)) {
+                        slide1power = (0.75 * error1);
+                    } else {
+                        slide1power = (Kp * error1);
+                    }
+                    slide1.setPower(slide1power);
+
+                    // We need a new slide2 power that will correct for error
+                    double slide2power;
+
+                    // Calculates amount of ticks off slide2 is from target
+                    double error2 = target - slide2.getCurrentPosition();
+
+                    // If error1 is greater than 80, correct by faster speed, else correct by usual speed
+                    if ((Math.abs(error2) > 80)) {
+                        slide2power = 0.75 * error2;
+                    } else {
+                        slide2power = Kp * error2;
+                    }
+                    slide2.setPower(slide2power);
+
+                    telemetry.addData("Slide1 Position", slide1.getCurrentPosition());
+                    telemetry.addData("Slide2 Position", slide1.getCurrentPosition());
+                    telemetry.update();
+
+                }
+                sleep(1000);
+                return false;
+            }
+        }
+
 
         public Action GrabCone() {
             return new GrabCone();
@@ -366,7 +441,10 @@ public class MidCycleAuto extends LinearOpMode
         public Action OpenClaw(){
             return new OpenClaw();
         }
-        
+
+        public Action RetractionSequence(){
+            return new RetractionSequence();
+        }
     }
 
     @Override
@@ -419,166 +497,50 @@ public class MidCycleAuto extends LinearOpMode
         Action DriveToIntakeFromInitialDeposit;
         Action DriveToIntake;
         Action DriveToDeposit;
-        Action parkingZone1;
-        Action parkingZone2;
-        Action parkingZone3;
+        Action ParkZone1;
+        Action ParkZone2;
+        Action ParkZone3;
 
 
         //set staring position, unit is inches
         MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(11, 36, Math.toRadians(0)));
 
-        parkingZone1 = drive.actionBuilder(drive.pose)
+        DriveInitialDeposit = drive.actionBuilder(drive.pose)
                 .turn(Math.toRadians(90))
-
-                .strafeTo(new Vector2d(45, 36))
+                .strafeTo(new Vector2d(45,36))
                 .waitSeconds(0.4)
-                .strafeTo(new Vector2d(57, 36))
-                .strafeTo(new Vector2d(56.5, 12))
+                .build();
+
+        DriveToIntakeFromInitialDeposit = drive.actionBuilder(new Pose2d(45,36,Math.toRadians(90)))
+                .strafeTo(new Vector2d(57,36))
+                .strafeTo(new Vector2d(56.5,12))
                 .waitSeconds(0.2)
-                .strafeToLinearHeading(new Vector2d(55, 38), Math.toRadians(120))
-                .waitSeconds(0.4)
+                .build();
 
-                .strafeToLinearHeading(new Vector2d(56, 12), Math.toRadians(90))
-
-
+        DriveToIntake = drive.actionBuilder(new Pose2d(55,38,Math.toRadians(120)))
+                .strafeToLinearHeading(new Vector2d(56,12),Math.toRadians(90))
                 .waitSeconds(0.2)
-                .strafeToLinearHeading(new Vector2d(55, 38), Math.toRadians(120))
+                .build();
 
-
-                .waitSeconds(0.4)
-                .strafeToLinearHeading(new Vector2d(56, 12), Math.toRadians(90))
-
-                .waitSeconds(0.2)
-
-                .strafeToLinearHeading(new Vector2d(55, 38), Math.toRadians(120))
-
-
-                .waitSeconds(0.4)
-
-                .strafeToLinearHeading(new Vector2d(55, 12), Math.toRadians(90))
-
-
-                .waitSeconds(0.2)
-
-                .strafeToLinearHeading(new Vector2d(55, 38), Math.toRadians(120))
-
-
-                .waitSeconds(0.4)
-                .strafeToLinearHeading(new Vector2d(55, 12), Math.toRadians(90))
-
-
-                .waitSeconds(0.2)
-
+        DriveToDeposit = drive.actionBuilder(new Pose2d(56,12,Math.toRadians(90)))
                 .strafeToLinearHeading(new Vector2d(55,38),Math.toRadians(120))
-
-
                 .waitSeconds(0.4)
-                .turn(Math.toRadians(-120))
+                .build();
 
+        ParkZone1 = drive.actionBuilder(new Pose2d(55,38,Math.toRadians(120)))
+                .turn(Math.toRadians(-120))
                 .strafeTo(new Vector2d(36,36))
                 .strafeTo(new Vector2d(36,60))
-
                 .build();
-        parkingZone2 = drive.actionBuilder (drive.pose)
-                .turn(Math.toRadians(90))
 
-                .strafeTo(new Vector2d(45, 36))
-                .waitSeconds(0.4)
-                .strafeTo(new Vector2d(57, 36))
-                .strafeTo(new Vector2d(56.5, 12))
-                .waitSeconds(0.2)
-                .strafeToLinearHeading(new Vector2d(55, 38), Math.toRadians(120))
-                .waitSeconds(0.4)
-
-                .strafeToLinearHeading(new Vector2d(56, 12), Math.toRadians(90))
-
-
-                .waitSeconds(0.2)
-                .strafeToLinearHeading(new Vector2d(55, 38), Math.toRadians(120))
-
-
-                .waitSeconds(0.4)
-                .strafeToLinearHeading(new Vector2d(56, 12), Math.toRadians(90))
-
-                .waitSeconds(0.2)
-
-                .strafeToLinearHeading(new Vector2d(55, 38), Math.toRadians(120))
-
-
-                .waitSeconds(0.4)
-
-                .strafeToLinearHeading(new Vector2d(55, 12), Math.toRadians(90))
-
-
-                .waitSeconds(0.2)
-
-                .strafeToLinearHeading(new Vector2d(55, 38), Math.toRadians(120))
-
-
-                .waitSeconds(0.4)
-                .strafeToLinearHeading(new Vector2d(55, 12), Math.toRadians(90))
-
-
-                .waitSeconds(0.2)
-
-                .strafeToLinearHeading(new Vector2d(55,38),Math.toRadians(120))
-
-
-                .waitSeconds(0.4)
+        ParkZone2 = drive.actionBuilder(new Pose2d(55,38,Math.toRadians(120)))
                 .turn(Math.toRadians(-120))
-
                 .build();
-        parkingZone3 = drive.actionBuilder(drive.pose)
-                .turn(Math.toRadians(90))
 
-                .strafeTo(new Vector2d(45, 36))
-                .waitSeconds(0.4)
-                .strafeTo(new Vector2d(57, 36))
-                .strafeTo(new Vector2d(56.5, 12))
-                .waitSeconds(0.2)
-                .strafeToLinearHeading(new Vector2d(55, 38), Math.toRadians(120))
-                .waitSeconds(0.4)
-
-                .strafeToLinearHeading(new Vector2d(56, 12), Math.toRadians(90))
-
-
-                .waitSeconds(0.2)
-                .strafeToLinearHeading(new Vector2d(55, 38), Math.toRadians(120))
-
-
-                .waitSeconds(0.4)
-                .strafeToLinearHeading(new Vector2d(56, 12), Math.toRadians(90))
-
-                .waitSeconds(0.2)
-
-                .strafeToLinearHeading(new Vector2d(55, 38), Math.toRadians(120))
-
-
-                .waitSeconds(0.4)
-
-                .strafeToLinearHeading(new Vector2d(55, 12), Math.toRadians(90))
-
-
-                .waitSeconds(0.2)
-
-                .strafeToLinearHeading(new Vector2d(55, 38), Math.toRadians(120))
-
-
-                .waitSeconds(0.4)
-                .strafeToLinearHeading(new Vector2d(55, 12), Math.toRadians(90))
-
-
-                .waitSeconds(0.2)
-
-                .strafeToLinearHeading(new Vector2d(55,38),Math.toRadians(120))
-
-
-                .waitSeconds(0.4)
+        ParkZone3 = drive.actionBuilder(new Pose2d(55,38,Math.toRadians(120)))
                 .turn(Math.toRadians(-120))
-
                 .strafeTo(new Vector2d(36,36))
                 .strafeTo(new Vector2d(36,12))
-
                 .build();
 
         boolean tagFound = false;
@@ -674,31 +636,80 @@ public class MidCycleAuto extends LinearOpMode
 
             // Runs autonomous and parks in zone 2
             // Runs if camera does not detect april tag
-            trajectoryActionChosen = parkingZone1;
+            trajectoryActionChosen = ParkZone2;
         }
         if(tagOfInterest.id == leftTag){
 
             // Runs autonomous and parks in zone 1
-            trajectoryActionChosen = parkingZone1;
+            trajectoryActionChosen = ParkZone1;
         }
         else if (tagOfInterest.id == middleTag){
 
             // Runs autonomous and parks in zone 2
-            trajectoryActionChosen = parkingZone2;
+            trajectoryActionChosen = ParkZone2;
         }
         else if (tagOfInterest.id == rightTag){
 
             // Runs autonomous and parks in zone 3
-            trajectoryActionChosen = parkingZone3;
+            trajectoryActionChosen = ParkZone3;
         }
-        Lift lift= new Lift ();
+        Lift lift= new Lift();
         Actions.runBlocking(
-                new ParallelAction(
+                new SequentialAction(
 
-                   trajectoryActionChosen
+                        lift.CloseClaw(),
+
+                        new ParallelAction(
+                                DriveInitialDeposit,
+                                lift.DepositPosition()
+                        ),
+
+                        lift.OpenClaw(),
+
+                        new ParallelAction(
+                                DriveToIntakeFromInitialDeposit,
+                                lift.GrabCone()
+                        ),
+
+                        lift.OpenClaw(),
+
+                        new ParallelAction(
+                                DriveToIntakeFromInitialDeposit,
+                                lift.GrabCone()
+                        ),
+
+                        lift.OpenClaw(),
+
+                        new ParallelAction(
+                                DriveToIntakeFromInitialDeposit,
+                                lift.GrabCone()
+                        ),
+
+                        lift.OpenClaw(),
+
+                        new ParallelAction(
+                                DriveToIntakeFromInitialDeposit,
+                                lift.GrabCone()
+                        ),
+
+                        lift.OpenClaw(),
+
+                        new ParallelAction(
+                                DriveToIntakeFromInitialDeposit,
+                                lift.GrabCone()
+                        ),
+
+                        lift.OpenClaw(),
+
+                        new ParallelAction(
+                                trajectoryActionChosen,
+                                lift.RetractionSequence()
+                        )
+
+
 
                         //I JUST REALIZED THIS IS WRONG, WILL BE ADDING DIFFERENT SEQUENCES LATER
-                        
+
                 )
         );
 
