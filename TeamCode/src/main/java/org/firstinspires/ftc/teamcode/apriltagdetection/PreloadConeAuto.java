@@ -383,7 +383,7 @@ public class PreloadConeAuto extends LinearOpMode
 
         DriveInitialDeposit = drive.actionBuilder(drive.pose)
                 .strafeTo(new Vector2d(11,72))
-                .strafeTo(new Vector2d(20,72))
+                .strafeTo(new Vector2d(36,72))
                 .waitSeconds(0.4)
                 .build();
 
@@ -404,10 +404,6 @@ public class PreloadConeAuto extends LinearOpMode
                 .strafeTo(new Vector2d(11,12))
                 .strafeTo(new Vector2d(36,12))
                 .build();
-        Action InitialPosition = drive.actionBuilder(drive.pose)
-                .strafeTo(new Vector2d(50,50 ))
-                .build();
-
 
         boolean tagFound = false;
 
@@ -502,7 +498,7 @@ public class PreloadConeAuto extends LinearOpMode
 
             // Runs autonomous and parks in zone 2
             // Runs if camera does not detect april tag
-            trajectoryActionChosen = ParkZone1;
+            trajectoryActionChosen = ParkZone2;
         }
         if(tagOfInterest.id == leftTag){
 
@@ -522,15 +518,12 @@ public class PreloadConeAuto extends LinearOpMode
         Lift lift= new Lift();
         Actions.runBlocking(
                 new SequentialAction(
-
                         lift.CloseClaw(),
                         DriveInitialDeposit,
                         lift.DepositPosition(),
                         lift.OpenClaw(),
                         lift.RetractionSequence(),
                         trajectoryActionChosen
-
-
                 )
         );
 

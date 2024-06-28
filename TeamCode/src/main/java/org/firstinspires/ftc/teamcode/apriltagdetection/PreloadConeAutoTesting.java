@@ -381,10 +381,6 @@ public class PreloadConeAutoTesting extends LinearOpMode
         //set staring position, unit is inches
         MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(11, 36, Math.toRadians(0)));
 
-        Action DriveToOrigin = drive.actionBuilder(drive.pose)
-                .strafeTo(new Vector2d(0,0))
-                .build();
-
         DriveInitialDeposit = drive.actionBuilder(drive.pose)
                 .turn(Math.toRadians(90))
                 .strafeTo(new Vector2d(45,36))
@@ -536,8 +532,18 @@ public class PreloadConeAutoTesting extends LinearOpMode
         Lift lift= new Lift();
         Actions.runBlocking(
                 new SequentialAction(
-                        DriveToOrigin
-
+                        DriveInitialDeposit,
+                        DriveToIntakeFromInitialDeposit,
+                        DriveToDeposit,
+                        DriveToIntake,
+                        DriveToDeposit,
+                        DriveToIntake,
+                        DriveToDeposit,
+                        DriveToIntake,
+                        DriveToDeposit,
+                        DriveToIntake,
+                        DriveToDeposit,
+                        trajectoryActionChosen
                 )
         );
 

@@ -1,3 +1,7 @@
+/* https://drive.google.com/file/d/1GAEcuIJ_Pu-IoopSYptUfXAdABRY6eKw/view
+    upload above file to control hub. Drag into "FIRST" folder.
+ */
+
 package org.firstinspires.ftc.teamcode.apriltagdetection;
 
 import android.annotation.SuppressLint;
@@ -78,7 +82,7 @@ public class MidCycleAuto extends LinearOpMode
         // last=0
 
         //NOTE: UPDATE TIMING ACCORDINGLY LATER
-        public class ArmMovement implements Action {
+        public class GrabCone implements Action {
             double target;
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
@@ -108,19 +112,7 @@ public class MidCycleAuto extends LinearOpMode
                 telemetry.addData("Slide2 Position", slide1.getCurrentPosition());
                 telemetry.update();
 
-
-
                 double Kp = 0.015;
-
-                arm1.setPosition(0.96);
-                arm2.setPosition(0.96);
-                wrist.setPosition(0.2);
-                claw.setPosition(0.3);
-
-                target = 140;
-                //move to deposit
-                while (slide1.getCurrentPosition() > 110 || slide2.getCurrentPosition() > 110) {
-
                 arm1.setPosition(0.02);
                 arm2.setPosition(0.02);
                 wrist.setPosition(0.91);
@@ -128,7 +120,6 @@ public class MidCycleAuto extends LinearOpMode
                 sleep(2000);
                 target = 170;
                 while (Math.abs(slide1.getCurrentPosition() - target) > 20 && Math.abs(slide2.getCurrentPosition() - target) > 20) {
-
                     double slide1power;
                     // Calculates amount of ticks off slide1 is from target
                     double error1 = -(target - slide1.getCurrentPosition()); // Error is negative because slide1 needs to reverse direction
@@ -158,64 +149,14 @@ public class MidCycleAuto extends LinearOpMode
                     telemetry.addData("Slide2 Position", slide1.getCurrentPosition());
                     telemetry.update();
                 }
-
-                sleep(2000);
-                claw.setPosition(0);
-                sleep(500);
-
-                arm1.setPosition(0.02);
-                arm2.setPosition(0.02);
-                wrist.setPosition(0.91);
-                claw.setPosition(0);
-
-                target = 170;
-                while (slide1.getCurrentPosition() > 150 || slide2.getCurrentPosition() > 150) {
-                    double slide1power;
-                    // Calculates amount of ticks off slide1 is from target
-                    double error1 = -(target - slide1.getCurrentPosition()); // Error is negative because slide1 needs to reverse direction
-
-                    // If error1 is greater than 80, correct by faster speed, else correct by usual speed
-                    if ((Math.abs(error1) > 80)) {
-                        slide1power = (0.75 * error1);
-                    } else {
-                        slide1power = (Kp * error1);
-                    }
-                    slide1.setPower(slide1power);
-
-                    // We need a new slide2 power that will correct for error
-                    double slide2power;
-
-                    // Calculates amount of ticks off slide2 is from target
-                    double error2 = target - slide2.getCurrentPosition();
-
-                    // If error1 is greater than 80, correct by faster speed, else correct by usual speed
-                    if ((Math.abs(error2) > 80)) {
-                        slide2power = 0.75 * error2;
-                    } else {
-                        slide2power = Kp * error2;
-                    }
-                    slide2.setPower(slide2power);
-                    telemetry.addData("Slide1 Position", slide1.getCurrentPosition());
-                    telemetry.addData("Slide2 Position", slide1.getCurrentPosition());
-                    telemetry.update();
-                }
-
-                sleep(1000);
-
                 claw.setPosition(0.3);
-                sleep(500);
+                sleep(300);
 
-                arm1.setPosition(0.96);
-                arm2.setPosition(0.96);
-                wrist.setPosition(0.2);
-                claw.setPosition(0.3);
-
-                target = 140;
-                //move to deposit
-                while (slide1.getCurrentPosition() > 110 ||  slide2.getCurrentPosition() > 110) {
+                double target2 = target*2;
+                while (Math.abs(slide1.getCurrentPosition() - target2) > 20 && Math.abs(slide2.getCurrentPosition() - target2) > 20) {
                     double slide1power;
                     // Calculates amount of ticks off slide1 is from target
-                    double error1 = -(target - slide1.getCurrentPosition()); // Error is negative because slide1 needs to reverse direction
+                    double error1 = -(target2 - slide1.getCurrentPosition()); // Error is negative because slide1 needs to reverse direction
 
                     // If error1 is greater than 80, correct by faster speed, else correct by usual speed
                     if ((Math.abs(error1) > 80)) {
@@ -229,7 +170,7 @@ public class MidCycleAuto extends LinearOpMode
                     double slide2power;
 
                     // Calculates amount of ticks off slide2 is from target
-                    double error2 = target - slide2.getCurrentPosition();
+                    double error2 = target2 - slide2.getCurrentPosition();
 
                     // If error1 is greater than 80, correct by faster speed, else correct by usual speed
                     if ((Math.abs(error2) > 80)) {
@@ -243,11 +184,19 @@ public class MidCycleAuto extends LinearOpMode
                     telemetry.update();
                 }
 
-                sleep(1500);
-
-                claw.setPosition(0);
-
-
+                if(target == 170){
+                    target=140;
+                    target2=300;
+                } else if(target == 140){
+                    target=105;
+                    target2=250;
+                } else if(target == 105){
+                    target=55;
+                    target2=230;
+                } else if(target == 55){
+                    target=0;
+                    target2=200;
+                }
                 return false;
             }
         }
@@ -476,8 +425,8 @@ public class MidCycleAuto extends LinearOpMode
         }
 
 
-        public Action ArmMovement() {
-            return new ArmMovement();
+        public Action GrabCone() {
+            return new GrabCone();
         }
 
         public Action DepositPosition() {
@@ -685,7 +634,7 @@ public class MidCycleAuto extends LinearOpMode
 
         if(tagOfInterest == null){
 
-            // Runs autonomous and parks in zone 1
+            // Runs autonomous and parks in zone 2
             // Runs if camera does not detect april tag
             trajectoryActionChosen = ParkZone2;
         }
@@ -756,7 +705,8 @@ public class MidCycleAuto extends LinearOpMode
                                 trajectoryActionChosen,
                                 lift.RetractionSequence()
                         )
-                        
+
+
 
                         //I JUST REALIZED THIS IS WRONG, WILL BE ADDING DIFFERENT SEQUENCES LATER
 
