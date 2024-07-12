@@ -82,8 +82,9 @@ public class MidCycleAuto extends LinearOpMode
         // last=0
 
         //NOTE: UPDATE TIMING ACCORDINGLY LATER
-        public class GrabCone implements Action {
+        public class GrabCone1 implements Action {
             double target;
+
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 DcMotorEx slide1 = hardwareMap.get(DcMotorEx.class, "slide1");
@@ -119,87 +120,376 @@ public class MidCycleAuto extends LinearOpMode
                 claw.setPosition(0);
                 sleep(2000);
                 target = 170;
-                while (Math.abs(slide1.getCurrentPosition() - target) > 20 && Math.abs(slide2.getCurrentPosition() - target) > 20) {
-                    double slide1power;
-                    // Calculates amount of ticks off slide1 is from target
-                    double error1 = -(target - slide1.getCurrentPosition()); // Error is negative because slide1 needs to reverse direction
 
-                    // If error1 is greater than 80, correct by faster speed, else correct by usual speed
-                    if ((Math.abs(error1) > 80)) {
-                        slide1power = (0.75 * error1);
-                    } else {
-                        slide1power = (Kp * error1);
-                    }
-                    slide1.setPower(slide1power);
+                double slide1power;
+                // Calculates amount of ticks off slide1 is from target
+                double error1 = -(target - slide1.getCurrentPosition()); // Error is negative because slide1 needs to reverse direction
 
-                    // We need a new slide2 power that will correct for error
-                    double slide2power;
-
-                    // Calculates amount of ticks off slide2 is from target
-                    double error2 = target - slide2.getCurrentPosition();
-
-                    // If error1 is greater than 80, correct by faster speed, else correct by usual speed
-                    if ((Math.abs(error2) > 80)) {
-                        slide2power = 0.75 * error2;
-                    } else {
-                        slide2power = Kp * error2;
-                    }
-                    slide2.setPower(slide2power);
-                    telemetry.addData("Slide1 Position", slide1.getCurrentPosition());
-                    telemetry.addData("Slide2 Position", slide1.getCurrentPosition());
-                    telemetry.update();
+                // If error1 is greater than 80, correct by faster speed, else correct by usual speed
+                if ((Math.abs(error1) > 80)) {
+                    slide1power = (0.75 * error1);
+                } else {
+                    slide1power = (Kp * error1);
                 }
+                slide1.setPower(slide1power);
+
+                // We need a new slide2 power that will correct for error
+                double slide2power;
+
+                // Calculates amount of ticks off slide2 is from target
+                double error2 = target - slide2.getCurrentPosition();
+
+                // If error1 is greater than 80, correct by faster speed, else correct by usual speed
+                if ((Math.abs(error2) > 80)) {
+                    slide2power = 0.75 * error2;
+                } else {
+                    slide2power = Kp * error2;
+                }
+                slide2.setPower(slide2power);
+                telemetry.addData("Slide1 Position", slide1.getCurrentPosition());
+                telemetry.addData("Slide2 Position", slide1.getCurrentPosition());
+                telemetry.update();
+                if (slide1.getCurrentPosition() > 140) {
+                    return false;
+                }
+                return true;
+            }
+        }
+        public class GrabCone2 implements Action {
+            double target;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                DcMotorEx slide1 = hardwareMap.get(DcMotorEx.class, "slide1");
+                DcMotorEx slide2 = hardwareMap.get(DcMotorEx.class, "slide2");
+
+                slide1.setDirection(DcMotorSimple.Direction.REVERSE);
+                slide2.setDirection(DcMotorSimple.Direction.FORWARD);
+
+                // Ensures that when no power is set on the motors they will hold their position
+                slide1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                slide2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+                slide1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                slide2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+                Servo arm1 = hardwareMap.servo.get("arm");
+                Servo arm2 = hardwareMap.servo.get("arm2");
+
+                arm1.setDirection(Servo.Direction.REVERSE);
+
+
+                Servo claw = hardwareMap.servo.get("claw");
+
+                Servo wrist = hardwareMap.servo.get("wrist");
+                telemetry.addData("Slide1 Position", slide1.getCurrentPosition());
+                telemetry.addData("Slide2 Position", slide1.getCurrentPosition());
+                telemetry.update();
+
+                double Kp = 0.015;
+                arm1.setPosition(0.02);
+                arm2.setPosition(0.02);
+                wrist.setPosition(0.91);
+                claw.setPosition(0);
+
+                return true;
+            }
+        }
+        public class GrabCone3 implements Action {
+            double target;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                DcMotorEx slide1 = hardwareMap.get(DcMotorEx.class, "slide1");
+                DcMotorEx slide2 = hardwareMap.get(DcMotorEx.class, "slide2");
+
+                slide1.setDirection(DcMotorSimple.Direction.REVERSE);
+                slide2.setDirection(DcMotorSimple.Direction.FORWARD);
+
+                // Ensures that when no power is set on the motors they will hold their position
+                slide1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                slide2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+                slide1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                slide2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+                Servo arm1 = hardwareMap.servo.get("arm");
+                Servo arm2 = hardwareMap.servo.get("arm2");
+
+                arm1.setDirection(Servo.Direction.REVERSE);
+
+
+                Servo claw = hardwareMap.servo.get("claw");
+
+                Servo wrist = hardwareMap.servo.get("wrist");
+                telemetry.addData("Slide1 Position", slide1.getCurrentPosition());
+                telemetry.addData("Slide2 Position", slide1.getCurrentPosition());
+                telemetry.update();
+
+                double Kp = 0.03; //tune this
+                arm1.setPosition(0.02);
+                arm2.setPosition(0.02);
+                wrist.setPosition(0.91);
+                claw.setPosition(0);
+                sleep(2000);
+                target = 115;
+
+                double slide1power;
+                // Calculates amount of ticks off slide1 is from target
+                double error1 = -(target - slide1.getCurrentPosition()); // Error is negative because slide1 needs to reverse direction
+
+                // If error1 is greater than 80, correct by faster speed, else correct by usual speed
+                if ((Math.abs(error1) > 80)) {
+                    slide1power = (0.75 * error1);
+                } else {
+                    slide1power = (Kp * error1);
+                }
+                slide1.setPower(slide1power);
+
+                // We need a new slide2 power that will correct for error
+                double slide2power;
+
+                // Calculates amount of ticks off slide2 is from target
+                double error2 = target - slide2.getCurrentPosition();
+
+                // If error1 is greater than 80, correct by faster speed, else correct by usual speed
+                if ((Math.abs(error2) > 80)) {
+                    slide2power = 0.75 * error2;
+                } else {
+                    slide2power = Kp * error2;
+                }
+                slide2.setPower(slide2power);
+                telemetry.addData("Slide1 Position", slide1.getCurrentPosition());
+                telemetry.addData("Slide2 Position", slide1.getCurrentPosition());
+                telemetry.update();
+                if (slide1.getCurrentPosition() < 80) {
+                    return false;
+                }
+                return true;
+            }
+        }
+        public class GrabCone4 implements Action {
+            double target;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                DcMotorEx slide1 = hardwareMap.get(DcMotorEx.class, "slide1");
+                DcMotorEx slide2 = hardwareMap.get(DcMotorEx.class, "slide2");
+
+                slide1.setDirection(DcMotorSimple.Direction.REVERSE);
+                slide2.setDirection(DcMotorSimple.Direction.FORWARD);
+
+                // Ensures that when no power is set on the motors they will hold their position
+                slide1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                slide2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+                slide1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                slide2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+                Servo arm1 = hardwareMap.servo.get("arm");
+                Servo arm2 = hardwareMap.servo.get("arm2");
+
+                arm1.setDirection(Servo.Direction.REVERSE);
+
+
+                Servo claw = hardwareMap.servo.get("claw");
+
+                Servo wrist = hardwareMap.servo.get("wrist");
+                telemetry.addData("Slide1 Position", slide1.getCurrentPosition());
+                telemetry.addData("Slide2 Position", slide1.getCurrentPosition());
+                telemetry.update();
+
+                double Kp = 0.03; //tune this
+                arm1.setPosition(0.02);
+                arm2.setPosition(0.02);
+                wrist.setPosition(0.91);
+                claw.setPosition(0);
+                sleep(2000);
+                target = 70;
+
+                double slide1power;
+                // Calculates amount of ticks off slide1 is from target
+                double error1 = -(target - slide1.getCurrentPosition()); // Error is negative because slide1 needs to reverse direction
+
+                // If error1 is greater than 80, correct by faster speed, else correct by usual speed
+                if ((Math.abs(error1) > 80)) {
+                    slide1power = (0.75 * error1);
+                } else {
+                    slide1power = (Kp * error1);
+                }
+                slide1.setPower(slide1power);
+
+                // We need a new slide2 power that will correct for error
+                double slide2power;
+
+                // Calculates amount of ticks off slide2 is from target
+                double error2 = target - slide2.getCurrentPosition();
+
+                // If error1 is greater than 80, correct by faster speed, else correct by usual speed
+                if ((Math.abs(error2) > 80)) {
+                    slide2power = 0.75 * error2;
+                } else {
+                    slide2power = Kp * error2;
+                }
+                slide2.setPower(slide2power);
+                telemetry.addData("Slide1 Position", slide1.getCurrentPosition());
+                telemetry.addData("Slide2 Position", slide1.getCurrentPosition());
+                telemetry.update();
+                if (slide1.getCurrentPosition() < 45) {
+                    return false;
+                }
+                return true;
+            }
+        }
+        public class GrabCone5 implements Action {
+            double target;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                DcMotorEx slide1 = hardwareMap.get(DcMotorEx.class, "slide1");
+                DcMotorEx slide2 = hardwareMap.get(DcMotorEx.class, "slide2");
+
+                slide1.setDirection(DcMotorSimple.Direction.REVERSE);
+                slide2.setDirection(DcMotorSimple.Direction.FORWARD);
+
+                // Ensures that when no power is set on the motors they will hold their position
+                slide1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                slide2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+                slide1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                slide2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+                Servo arm1 = hardwareMap.servo.get("arm");
+                Servo arm2 = hardwareMap.servo.get("arm2");
+
+                arm1.setDirection(Servo.Direction.REVERSE);
+
+
+                Servo claw = hardwareMap.servo.get("claw");
+
+                Servo wrist = hardwareMap.servo.get("wrist");
+                telemetry.addData("Slide1 Position", slide1.getCurrentPosition());
+                telemetry.addData("Slide2 Position", slide1.getCurrentPosition());
+                telemetry.update();
+
+                double Kp = 0.03; //tune this
+                arm1.setPosition(0.02);
+                arm2.setPosition(0.02);
+                wrist.setPosition(0.91);
+                claw.setPosition(0);
+                sleep(2000);
+                target = 0;
+
+                double slide1power;
+                // Calculates amount of ticks off slide1 is from target
+                double error1 = -(target - slide1.getCurrentPosition()); // Error is negative because slide1 needs to reverse direction
+
+                // If error1 is greater than 80, correct by faster speed, else correct by usual speed
+                if ((Math.abs(error1) > 80)) {
+                    slide1power = (0.75 * error1);
+                } else {
+                    slide1power = (Kp * error1);
+                }
+                slide1.setPower(slide1power);
+
+                // We need a new slide2 power that will correct for error
+                double slide2power;
+
+                // Calculates amount of ticks off slide2 is from target
+                double error2 = target - slide2.getCurrentPosition();
+
+                // If error1 is greater than 80, correct by faster speed, else correct by usual speed
+                if ((Math.abs(error2) > 80)) {
+                    slide2power = 0.75 * error2;
+                } else {
+                    slide2power = Kp * error2;
+                }
+                slide2.setPower(slide2power);
+                telemetry.addData("Slide1 Position", slide1.getCurrentPosition());
+                telemetry.addData("Slide2 Position", slide1.getCurrentPosition());
+                telemetry.update();
+                if (slide1.getCurrentPosition() > 5) {
+                    return false;
+                }
+                return true;
+            }
+        }
+
+
+        public class PickUpCone implements Action {
+            double target;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                DcMotorEx slide1 = hardwareMap.get(DcMotorEx.class, "slide1");
+                DcMotorEx slide2 = hardwareMap.get(DcMotorEx.class, "slide2");
+
+                slide1.setDirection(DcMotorSimple.Direction.REVERSE);
+                slide2.setDirection(DcMotorSimple.Direction.FORWARD);
+
+                // Ensures that when no power is set on the motors they will hold their position
+                slide1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                slide2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+                slide1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                slide2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+                Servo arm1 = hardwareMap.servo.get("arm");
+                Servo arm2 = hardwareMap.servo.get("arm2");
+
+                arm1.setDirection(Servo.Direction.REVERSE);
+
+
+                Servo claw = hardwareMap.servo.get("claw");
+
+                Servo wrist = hardwareMap.servo.get("wrist");
+                telemetry.addData("Slide1 Position", slide1.getCurrentPosition());
+                telemetry.addData("Slide2 Position", slide1.getCurrentPosition());
+                telemetry.update();
+
+                double Kp = 0.015;
+                arm1.setPosition(0.02);
+                arm2.setPosition(0.02);
+                wrist.setPosition(0.91);
                 claw.setPosition(0.3);
-                sleep(300);
+                sleep(2000); //tune this
+                target = 350;
 
-                double target2 = target*2;
-                while (Math.abs(slide1.getCurrentPosition() - target2) > 20 && Math.abs(slide2.getCurrentPosition() - target2) > 20) {
-                    double slide1power;
-                    // Calculates amount of ticks off slide1 is from target
-                    double error1 = -(target2 - slide1.getCurrentPosition()); // Error is negative because slide1 needs to reverse direction
+                double slide1power;
+                // Calculates amount of ticks off slide1 is from target
+                double error1 = -(target - slide1.getCurrentPosition()); // Error is negative because slide1 needs to reverse direction
 
-                    // If error1 is greater than 80, correct by faster speed, else correct by usual speed
-                    if ((Math.abs(error1) > 80)) {
-                        slide1power = (0.75 * error1);
-                    } else {
-                        slide1power = (Kp * error1);
-                    }
-                    slide1.setPower(slide1power);
-
-                    // We need a new slide2 power that will correct for error
-                    double slide2power;
-
-                    // Calculates amount of ticks off slide2 is from target
-                    double error2 = target2 - slide2.getCurrentPosition();
-
-                    // If error1 is greater than 80, correct by faster speed, else correct by usual speed
-                    if ((Math.abs(error2) > 80)) {
-                        slide2power = 0.75 * error2;
-                    } else {
-                        slide2power = Kp * error2;
-                    }
-                    slide2.setPower(slide2power);
-                    telemetry.addData("Slide1 Position", slide1.getCurrentPosition());
-                    telemetry.addData("Slide2 Position", slide1.getCurrentPosition());
-                    telemetry.update();
+                // If error1 is greater than 80, correct by faster speed, else correct by usual speed
+                if ((Math.abs(error1) > 80)) {
+                    slide1power = (0.75 * error1);
+                } else {
+                    slide1power = (Kp * error1);
                 }
+                slide1.setPower(slide1power);
 
-                if(target == 170){
-                    target=140;
-                    target2=300;
-                } else if(target == 140){
-                    target=105;
-                    target2=250;
-                } else if(target == 105){
-                    target=55;
-                    target2=230;
-                } else if(target == 55){
-                    target=0;
-                    target2=200;
+                // We need a new slide2 power that will correct for error
+                double slide2power;
+
+                // Calculates amount of ticks off slide2 is from target
+                double error2 = target - slide2.getCurrentPosition();
+
+                // If error1 is greater than 80, correct by faster speed, else correct by usual speed
+                if ((Math.abs(error2) > 80)) {
+                    slide2power = 0.75 * error2;
+                } else {
+                    slide2power = Kp * error2;
+                }
+                slide2.setPower(slide2power);
+                telemetry.addData("Slide1 Position", slide1.getCurrentPosition());
+                telemetry.addData("Slide2 Position", slide1.getCurrentPosition());
+                telemetry.update();
+                if (slide1.getCurrentPosition() > 320) {
+                    return false;
                 }
                 return false;
             }
         }
+
 
         public class DepositPosition implements Action {
             @Override
@@ -241,37 +531,39 @@ public class MidCycleAuto extends LinearOpMode
                 arm2.setPosition(0.96);
                 wrist.setPosition(0.2);
                 target = 140;
-                while (Math.abs(slide1.getCurrentPosition() - target) > 20 && Math.abs(slide2.getCurrentPosition() - target) > 20) {
-                    double slide1power;
-                    // Calculates amount of ticks off slide1 is from target
-                    double error1 = -(target - slide1.getCurrentPosition()); // Error is negative because slide1 needs to reverse direction
+                double slide1power;
+                // Calculates amount of ticks off slide1 is from target
+                double error1 = -(target - slide1.getCurrentPosition()); // Error is negative because slide1 needs to reverse direction
 
-                    // If error1 is greater than 80, correct by faster speed, else correct by usual speed
-                    if ((Math.abs(error1) > 80)) {
-                        slide1power = (0.75 * error1);
-                    } else {
-                        slide1power = (Kp * error1);
-                    }
-                    slide1.setPower(slide1power);
-
-                    // We need a new slide2 power that will correct for error
-                    double slide2power;
-
-                    // Calculates amount of ticks off slide2 is from target
-                    double error2 = target - slide2.getCurrentPosition();
-
-                    // If error1 is greater than 80, correct by faster speed, else correct by usual speed
-                    if ((Math.abs(error2) > 80)) {
-                        slide2power = 0.75 * error2;
-                    } else {
-                        slide2power = Kp * error2;
-                    }
-                    slide2.setPower(slide2power);
-                    telemetry.addData("Slide1 Position", slide1.getCurrentPosition());
-                    telemetry.addData("Slide2 Position", slide1.getCurrentPosition());
-                    telemetry.update();
+                // If error1 is greater than 80, correct by faster speed, else correct by usual speed
+                if ((Math.abs(error1) > 80)) {
+                    slide1power = (0.75 * error1);
+                } else {
+                    slide1power = (Kp * error1);
                 }
-                return false;
+                slide1.setPower(slide1power);
+
+                // We need a new slide2 power that will correct for error
+                double slide2power;
+
+                // Calculates amount of ticks off slide2 is from target
+                double error2 = target - slide2.getCurrentPosition();
+
+                // If error1 is greater than 80, correct by faster speed, else correct by usual speed
+                if ((Math.abs(error2) > 80)) {
+                    slide2power = 0.75 * error2;
+                } else {
+                    slide2power = Kp * error2;
+                }
+                slide2.setPower(slide2power);
+                telemetry.addData("Slide1 Position", slide1.getCurrentPosition());
+                telemetry.addData("Slide2 Position", slide1.getCurrentPosition());
+                telemetry.update();
+                if (Math.abs(slide1.getCurrentPosition()-target)<20){
+                    return false;
+
+                }
+                return true;
             }
         }
 
@@ -342,7 +634,7 @@ public class MidCycleAuto extends LinearOpMode
                 telemetry.addData("Slide2 Position", slide1.getCurrentPosition());
                 telemetry.update();
 
-                claw.setPosition(0);
+                claw.setPosition(0.3);
 
 
                 return false;
@@ -425,8 +717,23 @@ public class MidCycleAuto extends LinearOpMode
         }
 
 
-        public Action GrabCone() {
-            return new GrabCone();
+        public Action GrabCone1() {
+            return new GrabCone1();
+        }
+        public Action GrabCone2() {
+            return new GrabCone2();
+        }
+        public Action GrabCone3() {
+            return new GrabCone3();
+        }
+        public Action GrabCone4() {
+            return new GrabCone4();
+        }
+        public Action GrabCone5() {
+            return new GrabCone5();
+        }
+        public Action PickUpCone() {
+            return new PickUpCone();
         }
 
         public Action DepositPosition() {
@@ -668,38 +975,78 @@ public class MidCycleAuto extends LinearOpMode
 
                         new ParallelAction(
                                 DriveToIntakeFromInitialDeposit,
-                                lift.GrabCone()
+                                lift.GrabCone1()
+                        ),
+
+                        lift.CloseClaw(),
+                        lift.PickUpCone(),
+
+                        new ParallelAction(
+                                DriveToDeposit,
+                                lift.DepositPosition()
                         ),
 
                         lift.OpenClaw(),
 
                         new ParallelAction(
-                                DriveToIntakeFromInitialDeposit,
-                                lift.GrabCone()
+                                DriveToIntake,
+                                lift.GrabCone2()
+                        ),
+
+                        lift.CloseClaw(),
+                        lift.PickUpCone(),
+
+                        new ParallelAction(
+                                DriveToDeposit,
+                                lift.DepositPosition()
                         ),
 
                         lift.OpenClaw(),
 
                         new ParallelAction(
-                                DriveToIntakeFromInitialDeposit,
-                                lift.GrabCone()
+                                DriveToIntake,
+                                lift.GrabCone3()
+                        ),
+
+                        lift.CloseClaw(),
+                        lift.PickUpCone(),
+
+                        new ParallelAction(
+                                DriveToDeposit,
+                                lift.DepositPosition()
                         ),
 
                         lift.OpenClaw(),
 
                         new ParallelAction(
-                                DriveToIntakeFromInitialDeposit,
-                                lift.GrabCone()
+                                DriveToIntake,
+                                lift.GrabCone4()
+                        ),
+
+                        lift.CloseClaw(),
+                        lift.PickUpCone(),
+
+                        new ParallelAction(
+                                DriveToDeposit,
+                                lift.DepositPosition()
                         ),
 
                         lift.OpenClaw(),
 
                         new ParallelAction(
-                                DriveToIntakeFromInitialDeposit,
-                                lift.GrabCone()
+                                DriveToIntake,
+                                lift.GrabCone5()
                         ),
 
+                        lift.CloseClaw(),
+                        lift.PickUpCone(),
+
+                        new ParallelAction(
+                                DriveToDeposit,
+                                lift.DepositPosition()
+                        ),
                         lift.OpenClaw(),
+
 
                         new ParallelAction(
                                 trajectoryActionChosen,

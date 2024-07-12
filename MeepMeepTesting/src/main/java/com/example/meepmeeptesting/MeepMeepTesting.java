@@ -15,12 +15,24 @@ public class MeepMeepTesting {
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
                 .build();
 
-        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(0, 0, 0))
-                .strafeToLinearHeading(new Vector2d(48,36),Math.PI/2)
-                .strafeToLinearHeading(new Vector2d(0,0),0)
+        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(-36.86, 61.64, Math.toRadians(-90.00)))
+                        .strafeTo(new Vector2d(-36.66, 36.05))
+                        .strafeToLinearHeading(new Vector2d(-57.17, 36.46),Math.toRadians(0))
+                        .strafeToLinearHeading(new Vector2d(-57.17, 8.43), Math.toRadians(0))
+                        .strafeToLinearHeading(new Vector2d(51.89, 8.43), 0)
+                        .strafeToLinearHeading(new Vector2d(51.89, 37.27), Math.toRadians(0))
+                        .strafeToLinearHeading(new Vector2d(51.89, 8.43), 0)
+                .strafeToLinearHeading(new Vector2d(-57.17, 8.43), Math.toRadians(0))
+                .strafeToLinearHeading(new Vector2d(51.89, 8.43), 0)
+                .strafeToLinearHeading(new Vector2d(51.89, 37.27), Math.toRadians(0))
+                .strafeToLinearHeading(new Vector2d(51.89, 8.43), 0)
+                .strafeToLinearHeading(new Vector2d(-57.17, 8.43), Math.toRadians(0))
+                .strafeToLinearHeading(new Vector2d(51.89, 8.43), 0)
+                .strafeToLinearHeading(new Vector2d(51.89, 37.27), Math.toRadians(0))
                 .build());
 
-        meepMeep.setBackground(MeepMeep.Background.FIELD_POWERPLAY_OFFICIAL)
+
+        meepMeep.setBackground(MeepMeep.Background.FIELD_CENTERSTAGE_OFFICIAL)
                 .setDarkMode(true)
                 .setBackgroundAlpha(0.95f)
                 .addEntity(myBot)
