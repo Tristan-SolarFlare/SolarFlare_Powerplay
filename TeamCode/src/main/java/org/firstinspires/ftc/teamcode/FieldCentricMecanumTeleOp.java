@@ -100,6 +100,13 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
 
         if (isStopRequested()) return;
 
+        int iterations = 0;
+        String gamepadButton = "";
+        String gamepadBumperLeft = "NA";
+        String gamepadBumperRighth = "NA";
+
+        double maxAdjustingPower = 0.2;
+        int maxErrorThreshold  = 67;
         while (opModeIsActive()) {
 
             double y = -gamepad1.left_stick_y; // y stick value should be reversed
@@ -152,15 +159,18 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
 
 
             }else if (gamepad1.b){ // Low junction
+                gamepadButton = "b";
                 linearSlidesTarget=440; //rough estimate - we have to tune the encoder positions
 
             }else if (gamepad1.x){ // Mid junction
+                gamepadButton = "x";
                 linearSlidesTarget = 150;// rough estimate - this has to be changed, the reason this is lower than low junction is because we get the added distance from the flip
                 arm1pos = 0.96;
                 arm2pos=0.96;
                 wristpos=0.2;
 
             }else if (gamepad1.y){ // High junction
+                gamepadButton = "y";
                 linearSlidesTarget = 430; //tune encoders
                 // Add code to flip servos
                 arm1pos = 0.96;
@@ -170,7 +180,7 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
             if (gamepad1.left_bumper){
                 //slide1.setPower(0.75);
                 //slide2.setPower(0.75);
-
+                gamepadBumperLeft = "Pressed";
                 if (linearSlidesTarget<630){
                     linearSlidesTarget= linearSlidesTarget + 15;
                 }
@@ -178,7 +188,7 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
             }else if (gamepad1.right_bumper){
                 //slide1.setPower(-0.5);
                 //slide2.setPower(-0.5);
-
+                gamepadBumperRighth = "Pressed";
                 if (linearSlidesTarget > -1){
                     linearSlidesTarget = linearSlidesTarget - 15;
                 }
@@ -199,11 +209,11 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
             double error1=-(linearSlidesTarget-slide1.getCurrentPosition()); // Error is negative because slide1 needs to reverse direction
 
             // If error1 is greater than 80, correct by faster speed, else correct by usual speed
-            if ((Math.abs(error1)>80)){
-                slide1power = (0.75*error1);
+            if ((Math.abs(error1)>maxErrorThreshold)){
+                slide1power = Math.signum(error1) * maxAdjustingPower;
             }
             else {
-                slide1power = (Kp*error1);
+                slide1power = maxAdjustingPower * error1 / maxErrorThreshold;
             }
             slide1.setPower(slide1power);
 
@@ -214,15 +224,18 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
             double error2=linearSlidesTarget-slide2.getCurrentPosition();
 
             // If error1 is greater than 80, correct by faster speed, else correct by usual speed
-            if ((Math.abs(error2)>80)){
-                slide2power = 0.75*error2;
+            if ((Math.abs(error2)>maxErrorThreshold)){
+                slide2power = Math.signum(error2) * maxAdjustingPower;
             }
             else {
-                slide2power = Kp*error2;
+                slide2power = maxAdjustingPower * error2 / maxErrorThreshold;
             }
             slide2.setPower(slide2power);
 
+
+
             // Sends data about robot to android phone
+            telemetry.addData("iterations:",++iterations);
             telemetry.addData("Slide1:",slide1.getCurrentPosition());
             telemetry.addData("Slide2:",slide2.getCurrentPosition());
             telemetry.addData("Target:",linearSlidesTarget);
@@ -232,6 +245,8 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
             telemetry.addData("slide 2 power:",slide2power);
             telemetry.addData("Wrist position:",wrist.getPosition());
             telemetry.update();
+
+            // sleep(3000);
 
             // Set powers for driving
             leftFront.setPower(frontLeftPower);

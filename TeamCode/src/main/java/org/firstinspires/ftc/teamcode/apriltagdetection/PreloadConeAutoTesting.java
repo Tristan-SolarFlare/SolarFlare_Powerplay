@@ -114,40 +114,42 @@ public class PreloadConeAutoTesting extends LinearOpMode
                 arm2.setPosition(0.96);
                 wrist.setPosition(0.2);
                 target = 440;
-                while (Math.abs(slide1.getCurrentPosition() - target) > 25 || Math.abs(slide2.getCurrentPosition() - target) > 25) {
-                    double slide1power;
-                    // Calculates amount of ticks off slide1 is from target
-                    double error1 = -(target - slide1.getCurrentPosition()); // Error is negative because slide1 needs to reverse direction
 
-                    // If error1 is greater than 80, correct by faster speed, else correct by usual speed
-                    if ((Math.abs(error1) > 80)) {
-                        slide1power = (0.75 * error1);
-                    } else {
-                        slide1power = (Kp * error1);
-                    }
-                    slide1.setPower(slide1power);
+                double slide1power;
+                // Calculates amount of ticks off slide1 is from target
+                double error1 = -(target - slide1.getCurrentPosition()); // Error is negative because slide1 needs to reverse direction
 
-                    // We need a new slide2 power that will correct for error
-                    double slide2power;
+                // If error1 is greater than 80, correct by faster speed, else correct by usual speed
+                if ((Math.abs(error1) > 80)) {
+                    slide1power = (0.75 * error1);
+                } else {
+                    slide1power = (Kp * error1);}
+                slide1.setPower(slide1power);
 
-                    // Calculates amount of ticks off slide2 is from target
-                    double error2 = target - slide2.getCurrentPosition();
+                // We need a new slide2 power that will correct for error
+                double slide2power;
 
-                    // If error1 is greater than 80, correct by faster speed, else correct by usual speed
-                    if ((Math.abs(error2) > 80)) {
-                        slide2power = 0.75 * error2;
-                    } else {
-                        slide2power = Kp * error2;
-                    }
-                    slide2.setPower(slide2power);
+                // Calculates amount of ticks off slide2 is from target
+                double error2 = target - slide2.getCurrentPosition();
 
-                    telemetry.addData("Slide1 Position", slide1.getCurrentPosition());
-                    telemetry.addData("Slide2 Position", slide1.getCurrentPosition());
-                    telemetry.update();
-
+                // If error1 is greater than 80, correct by faster speed, else correct by usual speed
+                if ((Math.abs(error2) > 80)) {
+                    slide2power = 0.75 * error2;
+                } else {
+                    slide2power = Kp * error2;
                 }
-                sleep(1000);
-                return false;
+                slide2.setPower(slide2power);
+
+                if (slide1.getCurrentPosition() > 410){
+                    return false;
+                }
+
+                telemetry.addData("Slide1 Position", slide1.getCurrentPosition());
+                telemetry.addData("Slide2 Position", slide1.getCurrentPosition());
+                telemetry.update();
+
+
+                return true;
             }
         }
 
@@ -382,40 +384,26 @@ public class PreloadConeAutoTesting extends LinearOpMode
         MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(11, 36, Math.toRadians(0)));
 
         DriveInitialDeposit = drive.actionBuilder(drive.pose)
-                .turn(Math.toRadians(90))
-                .strafeTo(new Vector2d(45,36))
-                .waitSeconds(0.4)
-                .build();
-
-        DriveToIntakeFromInitialDeposit = drive.actionBuilder(drive.pose)
-                .strafeTo(new Vector2d(56.5,36))
-                .strafeTo(new Vector2d(56.5,12))
-                .waitSeconds(0.2)
-                .build();
-
-        DriveToIntake = drive.actionBuilder(drive.pose)
-                .strafeToLinearHeading(new Vector2d(56,12),Math.toRadians(90))
-                .waitSeconds(0.2)
-                .build();
-
-        DriveToDeposit = drive.actionBuilder(drive.pose)
-                .strafeToLinearHeading(new Vector2d(55,38),Math.toRadians(120))
+                .strafeTo(new Vector2d(11,72))
+                .strafeTo(new Vector2d(36,72))
                 .waitSeconds(0.4)
                 .build();
 
         ParkZone1 = drive.actionBuilder(drive.pose)
-                .turn(Math.toRadians(-120))
-                .strafeTo(new Vector2d(36,36))
+                .strafeTo(new Vector2d(11,72))
+                .strafeTo(new Vector2d(11,60))
                 .strafeTo(new Vector2d(36,60))
                 .build();
 
         ParkZone2 = drive.actionBuilder(drive.pose)
-                .turn(Math.toRadians(-120))
+                .strafeTo(new Vector2d(11,72))
+                .strafeTo(new Vector2d(11,36))
+                .strafeTo(new Vector2d(36,36))
                 .build();
 
         ParkZone3 = drive.actionBuilder(drive.pose)
-                .turn(Math.toRadians(-120))
-                .strafeTo(new Vector2d(36,36))
+                .strafeTo(new Vector2d(11,72))
+                .strafeTo(new Vector2d(11,12))
                 .strafeTo(new Vector2d(36,12))
                 .build();
 
@@ -532,18 +520,9 @@ public class PreloadConeAutoTesting extends LinearOpMode
         Lift lift= new Lift();
         Actions.runBlocking(
                 new SequentialAction(
-                        DriveInitialDeposit,
-                        DriveToIntakeFromInitialDeposit,
-                        DriveToDeposit,
-                        DriveToIntake,
-                        DriveToDeposit,
-                        DriveToIntake,
-                        DriveToDeposit,
-                        DriveToIntake,
-                        DriveToDeposit,
-                        DriveToIntake,
-                        DriveToDeposit,
-                        trajectoryActionChosen
+
+                        lift.DepositPosition()
+
                 )
         );
 

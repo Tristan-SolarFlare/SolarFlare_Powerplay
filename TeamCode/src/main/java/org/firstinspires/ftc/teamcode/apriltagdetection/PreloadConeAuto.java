@@ -112,40 +112,58 @@ public class PreloadConeAuto extends LinearOpMode
                 sleep(300);
                 arm1.setPosition(0.96);
                 arm2.setPosition(0.96);
-                wrist.setPosition(0.2);
+                wrist.setPosition(0.3);
                 target = 440;
-                while (Math.abs(slide1.getCurrentPosition() - target) > 25 || Math.abs(slide2.getCurrentPosition() - target) > 25) {
-                    double slide1power;
-                    // Calculates amount of ticks off slide1 is from target
-                    double error1 = -(target - slide1.getCurrentPosition()); // Error is negative because slide1 needs to reverse direction
+                // Power applied if error is above maxErrorThreshold
+                double maxAdjustingPower = 0.5;
+                // minimum error for max power correction, else it will
+                int maxErrorThreshold  = 67;
+                double slide1power = 0.0;
+                double slide2power = 0.0;
+                int maxAcceptableError = 15;
+                while (Math.abs(slide1.getCurrentPosition() - target) > maxAcceptableError ||
+                        Math.abs(slide2.getCurrentPosition() - target) > maxAcceptableError) {
 
-                    // If error1 is greater than 80, correct by faster speed, else correct by usual speed
-                    if ((Math.abs(error1) > 80)) {
-                        slide1power = (0.75 * error1);
+                    if(Math.abs(slide1.getCurrentPosition() - target) > maxAcceptableError) {
+                        // Calculates amount of ticks off slide1 is from target
+                        double error1 = -(target - slide1.getCurrentPosition());
+
+
+                        if ((Math.abs(error1) > maxErrorThreshold)) {
+                            // signum finds the sign of the error
+                            slide1power = Math.signum(error1) * maxAdjustingPower;
+                        } else {
+                            // slidepower based off fraction of error times maxAdjusting power
+                            slide1power = (error1 / maxErrorThreshold) * maxAdjustingPower;
+                        }
+                        slide1.setPower(slide1power);
+                         } else {
+                        slide1.setPower(0.0);
+                        }
+
+                    if(Math.abs(slide2.getCurrentPosition() - target) > maxAcceptableError) {
+                        // We need a new slide2 power that will correct for error
+                        // Calculates amount of ticks off slide2 is from target
+                        double error2 = target - slide2.getCurrentPosition();
+
+
+                        if ((Math.abs(error2) > maxErrorThreshold)) {
+                            slide2power = Math.signum(error2) * maxAdjustingPower;
+                        } else {
+                            slide2power = (error2 / maxErrorThreshold) * maxAdjustingPower;
+                        }
+                        slide2.setPower(slide2power);
                     } else {
-                        slide1power = (Kp * error1);
+                        slide2.setPower(0.0);
                     }
-                    slide1.setPower(slide1power);
-
-                    // We need a new slide2 power that will correct for error
-                    double slide2power;
-
-                    // Calculates amount of ticks off slide2 is from target
-                    double error2 = target - slide2.getCurrentPosition();
-
-                    // If error1 is greater than 80, correct by faster speed, else correct by usual speed
-                    if ((Math.abs(error2) > 80)) {
-                        slide2power = 0.75 * error2;
-                    } else {
-                        slide2power = Kp * error2;
-                    }
-                    slide2.setPower(slide2power);
 
                     telemetry.addData("Slide1 Position", slide1.getCurrentPosition());
                     telemetry.addData("Slide2 Position", slide1.getCurrentPosition());
+                    telemetry.addData("Slide1 Power", slide1power);
+                    telemetry.addData("Slide2 Power", slide2power);
                     telemetry.update();
-
                 }
+
                 sleep(1000);
                 return false;
             }
@@ -258,7 +276,7 @@ public class PreloadConeAuto extends LinearOpMode
 
                 claw.setPosition(0);
 
-                sleep(1000 );
+                sleep(1000);
 
 
                 return false;
@@ -518,12 +536,11 @@ public class PreloadConeAuto extends LinearOpMode
         Lift lift= new Lift();
         Actions.runBlocking(
                 new SequentialAction(
-                        lift.CloseClaw(),
-                        DriveInitialDeposit,
-                        lift.DepositPosition(),
-                        lift.OpenClaw(),
-                        lift.RetractionSequence(),
-                        trajectoryActionChosen
+
+
+                        lift.DepositPosition()
+
+
                 )
         );
 
