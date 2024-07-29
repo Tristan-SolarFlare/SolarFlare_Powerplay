@@ -36,7 +36,7 @@ import java.util.ArrayList;
 
 public class PreloadConeAutoTesting extends LinearOpMode
 {
-
+    public static int target;
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
 
@@ -67,6 +67,105 @@ public class PreloadConeAutoTesting extends LinearOpMode
     AprilTagDetection tagOfInterest = null;
 
     public class Lift {
+        public class globalPID implements Action{
+
+            public boolean run(@NonNull TelemetryPacket packet){
+                DcMotorEx slide1 = hardwareMap.get(DcMotorEx.class, "slide1");
+                DcMotorEx slide2 = hardwareMap.get(DcMotorEx.class, "slide2");
+
+                slide1.setDirection(DcMotorSimple.Direction.REVERSE);
+                slide2.setDirection(DcMotorSimple.Direction.FORWARD);
+
+                slide1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                slide2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+                slide1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                slide2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+                telemetry.addData("Slide1 Position", slide1.getCurrentPosition());
+                telemetry.addData("Slide2 Position", slide1.getCurrentPosition());
+                telemetry.update();
+
+
+
+                return true;
+            }
+        }
+        public class setTarget implements Action {
+            private int target;
+            public setTarget(int target){
+                this.target = target;
+            }
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet){
+                DcMotorEx slide1 = hardwareMap.get(DcMotorEx.class, "slide1");
+                DcMotorEx slide2 = hardwareMap.get(DcMotorEx.class, "slide2");
+
+                slide1.setDirection(DcMotorSimple.Direction.REVERSE);
+                slide2.setDirection(DcMotorSimple.Direction.FORWARD);
+
+                slide1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                slide2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+                slide1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                slide2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+                telemetry.addData("Slide1 Position", slide1.getCurrentPosition());
+                telemetry.addData("Slide2 Position", slide1.getCurrentPosition());
+                telemetry.update();
+
+                double maxAdjustingPower = 1;
+                int maxErrorThreshold  = 67;
+                double slide1power = 0.0;
+                double slide2power = 0.0;
+                int maxAcceptableError = 15;
+
+                while (Math.abs(slide1.getCurrentPosition() - target) > maxAcceptableError ||
+                        Math.abs(slide2.getCurrentPosition() - target) > maxAcceptableError) {
+
+                    if(Math.abs(slide1.getCurrentPosition() - target) > maxAcceptableError) {
+                        // Calculates amount of ticks off slide1 is from target
+                        double error1 = -(target - slide1.getCurrentPosition());
+
+                        if ((Math.abs(error1) > maxErrorThreshold)) {
+                            // signum finds the sign of the error
+                            slide1power = Math.signum(error1) * maxAdjustingPower;
+                        } else {
+                            // slidepower based off fraction of error times maxAdjusting power
+                            slide1power = (error1 / maxErrorThreshold) * maxAdjustingPower;
+                        }
+                        slide1.setPower(slide1power);
+                    } else {
+                        slide1.setPower(0.0);
+                    }
+
+                    if(Math.abs(slide2.getCurrentPosition() - target) > maxAcceptableError) {
+                        // We need a new slide2 power that will correct for error
+                        // Calculates amount of ticks off slide2 is from target
+                        double error2 = target - slide2.getCurrentPosition();
+                        if ((Math.abs(error2) > maxErrorThreshold)) {
+                            slide2power = Math.signum(error2) * maxAdjustingPower;
+                        } else {
+                            slide2power = (error2 / maxErrorThreshold) * maxAdjustingPower;
+                        }
+                        slide2.setPower(slide2power);
+                    } else {
+                        slide2.setPower(0.0);
+                    }
+
+                    telemetry.addData("Slide1 Position", slide1.getCurrentPosition());
+                    telemetry.addData("Slide2 Position", slide1.getCurrentPosition());
+                    telemetry.addData("Slide1 Power", slide1power);
+                    telemetry.addData("Slide2 Power", slide2power);
+                    telemetry.update();
+                }
+                slide1.setPower(0);
+                slide2.setPower(0);
+                return false;
+            }
+
+
+        }
         // mid=120
         // topcone=150
         // second=120
@@ -311,6 +410,9 @@ public class PreloadConeAutoTesting extends LinearOpMode
             return new DepositPosition();
         }
 
+        public Action setTarget(int i){
+            return new setTarget(i);
+        }
         public Action OpenClaw() {
             return new OpenClaw();
 
@@ -521,7 +623,7 @@ public class PreloadConeAutoTesting extends LinearOpMode
         Actions.runBlocking(
                 new SequentialAction(
 
-                        lift.DepositPosition()
+                        lift.setTarget(440)
 
                 )
         );

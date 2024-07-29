@@ -679,7 +679,7 @@ public class MidCycleAuto extends LinearOpMode
                 sleep(600);
                 claw.setPosition(0);
                 target = 0;
-                while (Math.abs(slide1.getCurrentPosition() - target) > 5 || Math.abs(slide2.getCurrentPosition() - target) > 5) {
+                while (Math.abs(slide1.getCurrentPosition() - target) > 15 || Math.abs(slide2.getCurrentPosition() - target) > 15) {
                     double slide1power;
                     // Calculates amount of ticks off slide1 is from target
                     double error1 = -(target - slide1.getCurrentPosition()); // Error is negative because slide1 needs to reverse direction

@@ -1,7 +1,3 @@
-/* https://drive.google.com/file/d/1GAEcuIJ_Pu-IoopSYptUfXAdABRY6eKw/view
-    upload above file to control hub. Drag into "FIRST" folder.
- */
-
 package org.firstinspires.ftc.teamcode.apriltagdetection;
 
 import androidx.annotation.NonNull;
@@ -73,22 +69,27 @@ public class PreloadConeAuto extends LinearOpMode
         // third=85
         // fourth=40
         // last=0
+        DcMotorEx slide1 = hardwareMap.get(DcMotorEx.class, "slide1");
+        DcMotorEx slide2 = hardwareMap.get(DcMotorEx.class, "slide2");
+        public Lift(){
+            slide1.setDirection(DcMotorSimple.Direction.REVERSE);
+            slide2.setDirection(DcMotorSimple.Direction.FORWARD);
 
+            // Ensures that when no power is set on the motors they will hold their position
+            slide1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            slide2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+            slide1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            slide2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        }
         public class DepositPosition implements Action {
+            private int target;
+
+            public DepositPosition(int target) {
+                this.target = target;
+            }
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                DcMotorEx slide1 = hardwareMap.get(DcMotorEx.class, "slide1");
-                DcMotorEx slide2 = hardwareMap.get(DcMotorEx.class, "slide2");
-
-                slide1.setDirection(DcMotorSimple.Direction.REVERSE);
-                slide2.setDirection(DcMotorSimple.Direction.FORWARD);
-
-                // Ensures that when no power is set on the motors they will hold their position
-                slide1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                slide2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-                slide1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                slide2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
                 Servo arm1 = hardwareMap.servo.get("arm");
                 Servo arm2 = hardwareMap.servo.get("arm2");
@@ -115,7 +116,7 @@ public class PreloadConeAuto extends LinearOpMode
                 wrist.setPosition(0.3);
                 target = 440;
                 // Power applied if error is above maxErrorThreshold
-                double maxAdjustingPower = 0.5;
+                double maxAdjustingPower = 1;
                 // minimum error for max power correction, else it will
                 int maxErrorThreshold  = 67;
                 double slide1power = 0.0;
@@ -128,7 +129,6 @@ public class PreloadConeAuto extends LinearOpMode
                         // Calculates amount of ticks off slide1 is from target
                         double error1 = -(target - slide1.getCurrentPosition());
 
-
                         if ((Math.abs(error1) > maxErrorThreshold)) {
                             // signum finds the sign of the error
                             slide1power = Math.signum(error1) * maxAdjustingPower;
@@ -137,16 +137,14 @@ public class PreloadConeAuto extends LinearOpMode
                             slide1power = (error1 / maxErrorThreshold) * maxAdjustingPower;
                         }
                         slide1.setPower(slide1power);
-                         } else {
+                    } else {
                         slide1.setPower(0.0);
-                        }
+                    }
 
                     if(Math.abs(slide2.getCurrentPosition() - target) > maxAcceptableError) {
                         // We need a new slide2 power that will correct for error
                         // Calculates amount of ticks off slide2 is from target
                         double error2 = target - slide2.getCurrentPosition();
-
-
                         if ((Math.abs(error2) > maxErrorThreshold)) {
                             slide2power = Math.signum(error2) * maxAdjustingPower;
                         } else {
@@ -157,13 +155,14 @@ public class PreloadConeAuto extends LinearOpMode
                         slide2.setPower(0.0);
                     }
 
-                    telemetry.addData("Slide1 Position", slide1.getCurrentPosition());
+                   telemetry.addData("Slide1 Position", slide1.getCurrentPosition());
                     telemetry.addData("Slide2 Position", slide1.getCurrentPosition());
                     telemetry.addData("Slide1 Power", slide1power);
                     telemetry.addData("Slide2 Power", slide2power);
                     telemetry.update();
                 }
-
+                slide1.setPower(-0.05);
+                slide2.setPower(0.05);
                 sleep(1000);
                 return false;
             }
@@ -172,18 +171,6 @@ public class PreloadConeAuto extends LinearOpMode
         public class RetractionSequence implements Action {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                DcMotorEx slide1 = hardwareMap.get(DcMotorEx.class, "slide1");
-                DcMotorEx slide2 = hardwareMap.get(DcMotorEx.class, "slide2");
-
-                slide1.setDirection(DcMotorSimple.Direction.REVERSE);
-                slide2.setDirection(DcMotorSimple.Direction.FORWARD);
-
-                // Ensures that when no power is set on the motors they will hold their position
-                slide1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                slide2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-                slide1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                slide2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
                 Servo arm1 = hardwareMap.servo.get("arm");
                 Servo arm2 = hardwareMap.servo.get("arm2");
@@ -248,18 +235,6 @@ public class PreloadConeAuto extends LinearOpMode
         public class OpenClaw implements Action {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                DcMotorEx slide1 = hardwareMap.get(DcMotorEx.class, "slide1");
-                DcMotorEx slide2 = hardwareMap.get(DcMotorEx.class, "slide2");
-
-                slide1.setDirection(DcMotorSimple.Direction.REVERSE);
-                slide2.setDirection(DcMotorSimple.Direction.FORWARD);
-
-                // Ensures that when no power is set on the motors they will hold their position
-                slide1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                slide2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-                slide1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                slide2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
                 Servo arm1 = hardwareMap.servo.get("arm");
                 Servo arm2 = hardwareMap.servo.get("arm2");
@@ -287,18 +262,6 @@ public class PreloadConeAuto extends LinearOpMode
             @Override
 
             public boolean run(@NonNull TelemetryPacket packet) {
-                DcMotorEx slide1 = hardwareMap.get(DcMotorEx.class, "slide1");
-                DcMotorEx slide2 = hardwareMap.get(DcMotorEx.class, "slide2");
-
-                slide1.setDirection(DcMotorSimple.Direction.REVERSE);
-                slide2.setDirection(DcMotorSimple.Direction.FORWARD);
-
-                // Ensures that when no power is set on the motors they will hold their position
-                slide1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                slide2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-                slide1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                slide2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
                 Servo arm1 = hardwareMap.servo.get("arm");
                 Servo arm2 = hardwareMap.servo.get("arm2");
@@ -323,8 +286,8 @@ public class PreloadConeAuto extends LinearOpMode
         }
 
 
-        public Action DepositPosition() {
-            return new DepositPosition();
+        public Action DepositPosition(int i) {
+            return new DepositPosition(i);
         }
 
         public Action OpenClaw() {
@@ -348,23 +311,6 @@ public class PreloadConeAuto extends LinearOpMode
         aprilTagDetectionPipeline = new AprilTagDetectionPipeline(tagsize, fx, fy, cx, cy);
 
         camera.setPipeline(aprilTagDetectionPipeline);
-
-        DcMotorEx slide1 = hardwareMap.get(DcMotorEx.class,"slide1");
-        DcMotorEx slide2 = hardwareMap.get(DcMotorEx.class,"slide2");
-
-        slide1.setDirection(DcMotorSimple.Direction.REVERSE);
-        slide2.setDirection(DcMotorSimple.Direction.FORWARD);
-
-        // Ensures that when no power is set on the motors they will hold their position
-        slide1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        slide2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        slide1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        slide2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-
-        slide1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        slide2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
         {
             @Override
@@ -538,8 +484,10 @@ public class PreloadConeAuto extends LinearOpMode
                 new SequentialAction(
 
 
-                        lift.DepositPosition()
-
+                        lift.CloseClaw(),
+                        lift.DepositPosition(440),
+                        lift.OpenClaw(),
+                        lift.RetractionSequence()
 
                 )
         );
