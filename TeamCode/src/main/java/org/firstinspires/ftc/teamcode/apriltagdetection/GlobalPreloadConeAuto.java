@@ -119,14 +119,13 @@ class GlobalPreloadConeAuto extends LinearOpMode {
     }
 
     class DepositPosition implements Action {
-        public boolean isOver;
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
             arm1.setPosition(0.96);
             arm2.setPosition(0.96);
             wrist.setPosition(0.3);
             target = 440;
-            if (!isOver) {
+            if ((Math.abs(slide1.getCurrentPosition() - target) <= 15) && (Math.abs(slide2.getCurrentPosition() - target) < 15)) {
                 return true;
             } else {
                 return false;
@@ -161,14 +160,13 @@ class GlobalPreloadConeAuto extends LinearOpMode {
         }
     }
     class RetractionSequence implements Action {
-        public boolean isOver;
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
             target = 0;
             arm1.setPosition(0.02);
             arm2.setPosition(0.02);
             wrist.setPosition(0.91);
-            if (!isOver) {
+            if ((Math.abs(slide1.getCurrentPosition() - target) <= 15) && (Math.abs(slide2.getCurrentPosition() - target) < 15)) {
                 return true;
             } else {
                 return false;
