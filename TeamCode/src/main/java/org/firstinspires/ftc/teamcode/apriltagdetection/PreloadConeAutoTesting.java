@@ -623,7 +623,7 @@ public class PreloadConeAutoTesting extends LinearOpMode
         Actions.runBlocking(
                 new SequentialAction(
 
-                        lift.setTarget(440)
+                        lift.DepositPosition()
 
                 )
         );

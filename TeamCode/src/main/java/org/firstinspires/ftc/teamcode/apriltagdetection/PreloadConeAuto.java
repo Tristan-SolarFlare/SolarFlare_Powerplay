@@ -484,10 +484,8 @@ public class PreloadConeAuto extends LinearOpMode
                 new SequentialAction(
 
 
-                        lift.CloseClaw(),
-                        lift.DepositPosition(440),
-                        lift.OpenClaw(),
-                        lift.RetractionSequence()
+
+                        lift.DepositPosition(440)
 
                 )
         );
