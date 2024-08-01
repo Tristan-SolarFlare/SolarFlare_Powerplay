@@ -30,7 +30,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import java.util.ArrayList;
 @Autonomous
-class GlobalPreloadConeAuto extends LinearOpMode {
+public class GlobalPreloadConeAuto extends LinearOpMode {
     private int target;
 
     Servo arm1 = hardwareMap.servo.get("arm");

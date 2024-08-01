@@ -89,7 +89,7 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
         arm1.setDirection(Servo.Direction.REVERSE);
 
         // Target position in ticks for linear slides, will be used later
-        double linearSlidesTarget = 0;
+        double target = 0;
 
         // Set slides Kp value
         double Kp = 0.015;
@@ -101,12 +101,6 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
         if (isStopRequested()) return;
 
         int iterations = 0;
-        String gamepadButton = "";
-        String gamepadBumperLeft = "NA";
-        String gamepadBumperRighth = "NA";
-
-        double maxAdjustingPower = 0.2;
-        int maxErrorThreshold  = 67;
         while (opModeIsActive()) {
 
             double y = -gamepad1.left_stick_y; // y stick value should be reversed
@@ -138,7 +132,7 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
             double liftSpeed = 250; // ticks per second
 
             if ((useTimer==1) && (timer.seconds() > 0.7)){
-                linearSlidesTarget = 0;
+                target = 0;
                 useTimer = 0;
             }
 
@@ -159,19 +153,16 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
 
 
             }else if (gamepad1.b){ // Low junction
-                gamepadButton = "b";
-                linearSlidesTarget=440; //rough estimate - we have to tune the encoder positions
+                target=440; //rough estimate - we have to tune the encoder positions
 
             }else if (gamepad1.x){ // Mid junction
-                gamepadButton = "x";
-                linearSlidesTarget = 150;// rough estimate - this has to be changed, the reason this is lower than low junction is because we get the added distance from the flip
+                target = 150;// rough estimate - this has to be changed, the reason this is lower than low junction is because we get the added distance from the flip
                 arm1pos = 0.96;
                 arm2pos=0.96;
                 wristpos=0.2;
 
             }else if (gamepad1.y){ // High junction
-                gamepadButton = "y";
-                linearSlidesTarget = 430; //tune encoders
+                target = 430; //tune encoders
                 // Add code to flip servos
                 arm1pos = 0.96;
                 arm2pos=0.96;
@@ -180,17 +171,17 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
             if (gamepad1.left_bumper){
                 //slide1.setPower(0.75);
                 //slide2.setPower(0.75);
-                gamepadBumperLeft = "Pressed";
-                if (linearSlidesTarget<630){
-                    linearSlidesTarget= linearSlidesTarget + 15;
+
+                if (target<630){
+                    target += 15;
                 }
 
             }else if (gamepad1.right_bumper){
                 //slide1.setPower(-0.5);
                 //slide2.setPower(-0.5);
-                gamepadBumperRighth = "Pressed";
-                if (linearSlidesTarget > -1){
-                    linearSlidesTarget = linearSlidesTarget - 15;
+
+                if (target > -1){
+                    target -= 15;
                 }
             }
 
@@ -201,52 +192,23 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
             wrist.setPosition((wristpos));
 
 
-            // We need a new slide1 power that will correct for error
-            double slide1power;
-
-
-            // Calculates amount of ticks off slide1 is from target
-            double error1=-(linearSlidesTarget-slide1.getCurrentPosition()); // Error is negative because slide1 needs to reverse direction
-
-            // If error1 is greater than 80, correct by faster speed, else correct by usual speed
-            if ((Math.abs(error1)>maxErrorThreshold)){
-                slide1power = Math.signum(error1) * maxAdjustingPower;
-            }
-            else {
-                slide1power = maxAdjustingPower * error1 / maxErrorThreshold;
-            }
-            slide1.setPower(slide1power);
-
-            // We need a new slide2 power that will correct for error
-            double slide2power;
-
-            // Calculates amount of ticks off slide2 is from target
-            double error2=linearSlidesTarget-slide2.getCurrentPosition();
-
-            // If error1 is greater than 80, correct by faster speed, else correct by usual speed
-            if ((Math.abs(error2)>maxErrorThreshold)){
-                slide2power = Math.signum(error2) * maxAdjustingPower;
-            }
-            else {
-                slide2power = maxAdjustingPower * error2 / maxErrorThreshold;
-            }
-            slide2.setPower(slide2power);
-
+            int error1 = (int) (target - slide1.getCurrentPosition());
+            slide1.setPower(-error1 * Kp);
+            int error2 = (int) (target - slide2.getCurrentPosition());
+            slide2.setPower(error2 * Kp);
+            telemetry.addData("slide1 pos", slide1.getCurrentPosition());
+            telemetry.addData("slide2 pos", slide2.getCurrentPosition());
+            telemetry.update();
 
 
             // Sends data about robot to android phone
             telemetry.addData("iterations:",++iterations);
             telemetry.addData("Slide1:",slide1.getCurrentPosition());
             telemetry.addData("Slide2:",slide2.getCurrentPosition());
-            telemetry.addData("Target:",linearSlidesTarget);
+            telemetry.addData("Target:",target);
             telemetry.addData("Error1:",error1);
             telemetry.addData("Error2:",error2);
-            telemetry.addData("Slide 1 Power:",slide1power);
-            telemetry.addData("slide 2 power:",slide2power);
-            telemetry.addData("Wrist position:",wrist.getPosition());
             telemetry.update();
-
-            // sleep(3000);
 
             // Set powers for driving
             leftFront.setPower(frontLeftPower);
