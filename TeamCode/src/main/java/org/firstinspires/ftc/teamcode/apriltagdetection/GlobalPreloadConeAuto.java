@@ -32,16 +32,15 @@ import java.util.ArrayList;
 @Autonomous
 public class GlobalPreloadConeAuto extends LinearOpMode {
     private int target;
+    Servo arm1;
+    Servo arm2;
 
-    Servo arm1 = hardwareMap.servo.get("arm");
-    Servo arm2 = hardwareMap.servo.get("arm2");
+    DcMotorEx slide1;
+    DcMotorEx slide2;
 
-    DcMotorEx slide1 = hardwareMap.get(DcMotorEx.class, "slide1");
-    DcMotorEx slide2 = hardwareMap.get(DcMotorEx.class, "slide2");
+    Servo claw;
 
-    Servo claw = hardwareMap.servo.get("claw");
-
-    Servo wrist = hardwareMap.servo.get("wrist");
+    Servo wrist;
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
 
@@ -176,6 +175,15 @@ public class GlobalPreloadConeAuto extends LinearOpMode {
     }
     @Override
     public void runOpMode() {
+        arm1 = hardwareMap.servo.get("arm");
+        arm2 = hardwareMap.servo.get("arm2");
+
+        slide1 = hardwareMap.get(DcMotorEx.class, "slide1");
+        slide2 = hardwareMap.get(DcMotorEx.class, "slide2");
+
+        claw = hardwareMap.servo.get("claw");
+
+        wrist = hardwareMap.servo.get("wrist");
         arm1.setDirection(Servo.Direction.REVERSE);
         slide1.setDirection(DcMotorSimple.Direction.REVERSE);
         slide2.setDirection(DcMotorSimple.Direction.FORWARD);
