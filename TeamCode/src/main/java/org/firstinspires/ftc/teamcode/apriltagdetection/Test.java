@@ -154,7 +154,7 @@ public class Test extends LinearOpMode {
         public Action armsUp(){return new ArmsUp();}
         public Action armsDown(){return new ArmsDown();}
 
-    
+
 
     public void runOpMode() {
         slide1 = hardwareMap.get(DcMotorEx.class, "slide1");
