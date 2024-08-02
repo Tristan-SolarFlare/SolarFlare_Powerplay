@@ -126,9 +126,9 @@ public class GlobalPreloadConeAuto extends LinearOpMode {
             wrist.setPosition(0.3);
             target = 440;
             if ((Math.abs(slide1.getCurrentPosition() - target) <= 15) && (Math.abs(slide2.getCurrentPosition() - target) < 15)) {
-                return true;
-            } else {
                 return false;
+            } else {
+                return true;
             }
         }
     }
@@ -167,9 +167,9 @@ public class GlobalPreloadConeAuto extends LinearOpMode {
             arm2.setPosition(0.02);
             wrist.setPosition(0.91);
             if ((Math.abs(slide1.getCurrentPosition() - target) <= 15) && (Math.abs(slide2.getCurrentPosition() - target) < 15)) {
-                return true;
-            } else {
                 return false;
+            } else {
+                return true;
             }
         }
     }
