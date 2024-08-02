@@ -154,7 +154,7 @@ public class Test extends LinearOpMode {
         public Action armsUp(){return new ArmsUp();}
         public Action armsDown(){return new ArmsDown();}
 
-
+    
 
     public void runOpMode() {
         slide1 = hardwareMap.get(DcMotorEx.class, "slide1");
@@ -311,7 +311,6 @@ public class Test extends LinearOpMode {
                 new ParallelAction(
                         test.globalPID(),
                         new SequentialAction(
-
                         )
                 )
                 )
@@ -323,7 +322,6 @@ public class Test extends LinearOpMode {
         }
     }
 }
-
 
 
 
