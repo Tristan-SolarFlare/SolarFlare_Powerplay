@@ -28,6 +28,12 @@ import java.util.ArrayList;
 
 @Autonomous
 public class Test extends LinearOpMode {
+    DcMotorEx slide1;
+    DcMotorEx slide2;
+    Servo arm1;
+    Servo arm2;
+    Servo wrist;
+    Servo claw;
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
     static final double FEET_PER_METER = 3.28084;
@@ -47,13 +53,7 @@ public class Test extends LinearOpMode {
     double arm2pos = 0.02;
     double clawpos = 0.3;
     double wristpos = 0.91;
-    public class Lift {
-        DcMotorEx slide1 = hardwareMap.get(DcMotorEx.class, "slide1");
-        DcMotorEx slide2 = hardwareMap.get(DcMotorEx.class, "slide2");
-        Servo arm1 = hardwareMap.servo.get("arm");
-        Servo arm2 = hardwareMap.servo.get("arm2");
-        Servo wrist = hardwareMap.servo.get("wrist");
-        Servo claw = hardwareMap.servo.get("claw");
+
 
         public class SetSlidesTarget implements Action{
             public boolean run(@NonNull TelemetryPacket telemetryPacket){
@@ -154,9 +154,16 @@ public class Test extends LinearOpMode {
         public Action armsUp(){return new ArmsUp();}
         public Action armsDown(){return new ArmsDown();}
 
-    }
+
 
     public void runOpMode() {
+        slide1 = hardwareMap.get(DcMotorEx.class, "slide1");
+        slide2 = hardwareMap.get(DcMotorEx.class, "slide2");
+        arm1 = hardwareMap.servo.get("arm");
+        arm2 = hardwareMap.servo.get("arm2");
+        wrist = hardwareMap.servo.get("wrist");
+        claw = hardwareMap.servo.get("claw");
+
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
         aprilTagDetectionPipeline = new AprilTagDetectionPipeline(tagsize, fx, fy, cx, cy);
@@ -298,32 +305,12 @@ public class Test extends LinearOpMode {
 
             parkingZone = ParkZone3;
         }
-        Lift lift = new Lift();
+        Test test = new Test();
         Actions.runBlocking(new SequentialAction(
-                lift.initialize(),
+                test.initialize(),
                 new ParallelAction(
-                        lift.globalPID(),
+                        test.globalPID(),
                         new SequentialAction(
-                                /*
-                            DriveInitialDeposit,
-                                new SleepAction(2),
-                                lift.setSlidesTarget(440),
-                                lift.armsUp(),
-                                new SleepAction(2),
-                                lift.openClaw(),
-                                new SleepAction(2),
-                                lift.armsDown(),
-                                new SleepAction(0.75),
-                                lift.setSlidesTarget(0),
-                                parkingZone
-
-                                 */
-                                lift.setSlidesTarget(440),
-                                new SleepAction(5000),
-                                lift.setSlidesTarget(300)
-
-
-
 
                         )
                 )
@@ -336,6 +323,7 @@ public class Test extends LinearOpMode {
         }
     }
 }
+
 
 
 
