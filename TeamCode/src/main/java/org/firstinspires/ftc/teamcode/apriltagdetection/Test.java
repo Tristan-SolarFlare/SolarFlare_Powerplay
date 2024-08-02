@@ -7,6 +7,7 @@ import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -41,6 +42,7 @@ public class Test extends LinearOpMode {
     AprilTagDetection tagOfInterest = null;
     public int target = 0;
     double Kp = 0.02;
+    int iterations = 0;
     double arm1pos = 0.02;
     double arm2pos = 0.02;
     double clawpos = 0.3;
@@ -53,35 +55,45 @@ public class Test extends LinearOpMode {
         Servo wrist = hardwareMap.servo.get("wrist");
         Servo claw = hardwareMap.servo.get("claw");
 
-        public class HighJunction implements Action{
+        public class SetSlidesTarget implements Action{
             public boolean run(@NonNull TelemetryPacket telemetryPacket){
-                target = 440;
-                arm1pos = 0.96;
-                arm2pos = 0.96;
-                wristpos = 0.3;
-                claw.setPosition(0.3);
-                sleep(1000);
                 return false;
             }
-        }
-        public class DefaultPosition implements Action{
-            public boolean run(@NonNull TelemetryPacket telemetryPacket){
-                target = 0;
-                arm1pos = 0.02;
-                arm2pos = 0.02;
-                wristpos = 0.91;
-                claw.setPosition(0.3);
-                sleep(1000);
-                return false;
-            }
-        }
-        public class OpenClaw implements Action{
-            public boolean run(@NonNull TelemetryPacket telemetryPacket){
-                claw.setPosition(0);
-                return false;
+            public SetSlidesTarget(int e){
+                target = e;
             }
         }
 
+        public class OpenClaw implements Action{
+            public boolean run(@NonNull TelemetryPacket telemetryPacket){
+                clawpos = 0;
+                return false;
+            }
+        }
+        public class ArmsDown implements Action{
+            public boolean run(@NonNull TelemetryPacket telemetryPacket){
+                arm1pos = 0.02;
+                arm2pos = 0.02;
+                wristpos = 0.91;
+                clawpos = 0.3;
+                return false;
+            }
+        }
+        public class CloseClaw implements Action{
+            public boolean run(@NonNull TelemetryPacket telemetryPacket){
+                clawpos = 0.3;
+                return false;
+            }
+        }
+        public class ArmsUp implements Action{
+            public boolean run(@NonNull TelemetryPacket telemetryPacket){
+                arm1pos = 0.96;
+                arm2pos = 0.96;
+                wristpos = 0.3;
+                clawpos = 0.3;
+                return false;
+            }
+        }
 
         public class Init implements Action{
             public boolean run(@NonNull TelemetryPacket telemetryPacket){
@@ -109,18 +121,20 @@ public class Test extends LinearOpMode {
         public class GlobalPID implements Action {
             public boolean run(@NonNull TelemetryPacket telemetryPacket){
 
-                int error1 = target - slide1.getCurrentPosition();
-                slide1.setPower(-error1 * Kp);
-                int error2 = target - slide2.getCurrentPosition();
-                slide2.setPower(error2 * Kp);
+                    int error1 = target - slide1.getCurrentPosition();
+                    slide1.setPower(-error1 * Kp);
+                    int error2 = target - slide2.getCurrentPosition();
+                    slide2.setPower(error2 * Kp);
+
+                    arm1.setPosition(arm1pos);
+                    arm2.setPosition(arm2pos);
+                    claw.setPosition(clawpos);
+                    wrist.setPosition(wristpos);
+
                 telemetry.addData("slide1 pos", slide1.getCurrentPosition());
                 telemetry.addData("slide2 pos", slide2.getCurrentPosition());
+                telemetry.addData("iterations",iterations++);
                 telemetry.update();
-
-                arm1.setPosition(arm1pos);
-                arm2.setPosition(arm2pos);
-                claw.setPosition(clawpos);
-                wrist.setPosition(wristpos);
 
                 return true;
             }
@@ -128,9 +142,12 @@ public class Test extends LinearOpMode {
 
         public Action globalPID() {return new GlobalPID();}
         public Action initialize(){return new Init();}
-        public Action highJunction(){return new HighJunction();}
         public Action openClaw(){return new OpenClaw();}
-        public Action defaultPositon(){return new DefaultPosition();}
+        public Action closeClaw(){return new CloseClaw();}
+        public Action setSlidesTarget(int y){return new SetSlidesTarget(y);}
+        public Action armsUp(){return new ArmsUp();}
+        public Action armsDown(){return new ArmsDown();}
+
     }
 
     public void runOpMode() {
@@ -160,7 +177,6 @@ public class Test extends LinearOpMode {
         Action DriveInitialDeposit = drive.actionBuilder(drive.pose)
                 .strafeTo(new Vector2d(11,72))
                 .strafeTo(new Vector2d(36,72))
-                .waitSeconds(0.4)
                 .build();
 
         Action ParkZone1 = drive.actionBuilder(drive.pose)
@@ -283,10 +299,20 @@ public class Test extends LinearOpMode {
                         lift.globalPID(),
                         new SequentialAction(
                             DriveInitialDeposit,
-                            lift.highJunction(),
-                            lift.openClaw(),
-                            lift.defaultPositon(),
-                            parkingZone
+                                new SleepAction(2),
+                                lift.setSlidesTarget(440),
+                                lift.armsUp(),
+                                new SleepAction(2),
+                                lift.openClaw(),
+                                new SleepAction(2),
+                                lift.armsDown(),
+                                new SleepAction(0.75),
+                                lift.setSlidesTarget(0),
+                                parkingZone
+
+
+
+
                         )
                 )
                 )
