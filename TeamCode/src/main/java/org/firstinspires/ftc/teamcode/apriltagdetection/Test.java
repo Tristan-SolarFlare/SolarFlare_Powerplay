@@ -28,12 +28,6 @@ import java.util.ArrayList;
 
 @Autonomous
 public class Test extends LinearOpMode {
-    DcMotorEx slide1;
-    DcMotorEx slide2;
-    Servo arm1;
-    Servo arm2;
-    Servo wrist;
-    Servo claw;
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
     static final double FEET_PER_METER = 3.28084;
@@ -48,57 +42,48 @@ public class Test extends LinearOpMode {
     AprilTagDetection tagOfInterest = null;
     public int target = 0;
     double Kp = 0.02;
+    boolean isLiftMoving= false;
     int iterations = 0;
     double arm1pos = 0.02;
     double arm2pos = 0.02;
     double clawpos = 0.3;
     double wristpos = 0.91;
+    public class Lift {
+        DcMotorEx slide1 = hardwareMap.get(DcMotorEx.class, "slide1");
+        DcMotorEx slide2 = hardwareMap.get(DcMotorEx.class, "slide2");
+        Servo arm1 = hardwareMap.servo.get("arm");
+        Servo arm2 = hardwareMap.servo.get("arm2");
+        Servo wrist = hardwareMap.servo.get("wrist");
+        Servo claw = hardwareMap.servo.get("claw");
 
-
-        public class SetSlidesTarget implements Action{
+        public class HighJunction implements Action{
             public boolean run(@NonNull TelemetryPacket telemetryPacket){
-                telemetry.addLine("SetSlidesTarget.run(" + target + ")");
-                return false;
-            }
-            public SetSlidesTarget(int y){
-                target = y;
-            }
-        }
-
-        public class OpenClaw implements Action{
-            public boolean run(@NonNull TelemetryPacket telemetryPacket){
-                clawpos = 0;
-                telemetry.addLine("open claw ran");
-                return false;
-            }
-        }
-        public class ArmsDown implements Action{
-            public boolean run(@NonNull TelemetryPacket telemetryPacket){
-                arm1pos = 0.02;
-                arm2pos = 0.02;
-                wristpos = 0.91;
-                clawpos = 0.3;
-                telemetry.addLine("arms down ran");
-                return false;
-            }
-        }
-        public class CloseClaw implements Action{
-            public boolean run(@NonNull TelemetryPacket telemetryPacket){
-                clawpos = 0.3;
-                telemetry.addLine("close claw ran");
-                return false;
-            }
-        }
-        public class ArmsUp implements Action{
-            public boolean run(@NonNull TelemetryPacket telemetryPacket){
+                target = 440;
                 arm1pos = 0.96;
                 arm2pos = 0.96;
                 wristpos = 0.3;
                 clawpos = 0.3;
-                telemetry.addLine("arms up ran");
+                isLiftMoving = false;
                 return false;
             }
         }
+        public class DefaultPosition implements Action{
+            public boolean run(@NonNull TelemetryPacket telemetryPacket){
+                target = 0;
+                arm1pos = 0.02;
+                arm2pos = 0.02;
+                wristpos = 0.91;
+                clawpos = 0.3;
+                return false;
+            }
+        }
+        public class OpenClaw implements Action{
+            public boolean run(@NonNull TelemetryPacket telemetryPacket){
+                claw.setPosition(0);
+                return false;
+            }
+        }
+
 
         public class Init implements Action{
             public boolean run(@NonNull TelemetryPacket telemetryPacket){
@@ -118,7 +103,7 @@ public class Test extends LinearOpMode {
                 arm2.setPosition(0.02);
                 wrist.setPosition(0.91);
                 claw.setPosition(0.3);
-                telemetry.addLine("init ran");
+
                 return false;
             }
         }
@@ -138,32 +123,46 @@ public class Test extends LinearOpMode {
 
                 telemetry.addData("slide1 pos", slide1.getCurrentPosition());
                 telemetry.addData("slide2 pos", slide2.getCurrentPosition());
-                telemetry.addData("target",target);
                 telemetry.addData("iterations",iterations++);
                 telemetry.update();
 
                 return true;
             }
         }
+        public class setTarget implements Action{
+            int e;
+            public setTarget(int a){
+                e=a;
+            }
+            public boolean run(@NonNull TelemetryPacket packet){
+                target=e;
+                arm1pos=0.02;
+                arm2pos=0.02;
+                wristpos=0.91;
+                return false;
+            }
+        }
+        public class SetSlidesTarget implements Action{
+            public boolean run(@NonNull TelemetryPacket telemetryPacket){
+                telemetry.addLine("SetSlidesTarget.run(" + target + ")");
+                return false;
+            }
+            public SetSlidesTarget(int y){
+                target = y;
+            }
+        }
 
+
+        public Action setSlidesTarget(int y){return  new SetSlidesTarget(y);}
         public Action globalPID() {return new GlobalPID();}
         public Action initialize(){return new Init();}
+        public Action highJunction(){return new HighJunction();}
         public Action openClaw(){return new OpenClaw();}
-        public Action closeClaw(){return new CloseClaw();}
-        public Action setSlidesTarget(int y){return new SetSlidesTarget(y);}
-        public Action armsUp(){return new ArmsUp();}
-        public Action armsDown(){return new ArmsDown();}
-
-
+        public Action defaultPosition(){return new DefaultPosition();}
+        public Action setTarget(int z){return new setTarget(z);}
+    }
 
     public void runOpMode() {
-        slide1 = hardwareMap.get(DcMotorEx.class, "slide1");
-        slide2 = hardwareMap.get(DcMotorEx.class, "slide2");
-        arm1 = hardwareMap.servo.get("arm");
-        arm2 = hardwareMap.servo.get("arm2");
-        wrist = hardwareMap.servo.get("wrist");
-        claw = hardwareMap.servo.get("claw");
-
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
         aprilTagDetectionPipeline = new AprilTagDetectionPipeline(tagsize, fx, fy, cx, cy);
@@ -302,15 +301,20 @@ public class Test extends LinearOpMode {
             parkingZone = ParkZone2;
         }
         else if (tagOfInterest.id == rightTag){
-
+            
             parkingZone = ParkZone3;
         }
-        Test test = new Test();
+        Lift lift = new Lift();
         Actions.runBlocking(new SequentialAction(
-                test.initialize(),
+                lift.initialize(),
                 new ParallelAction(
-                        test.globalPID(),
+                        lift.globalPID(),
                         new SequentialAction(
+                                lift.setSlidesTarget(300),
+                                new SleepAction(3),
+                                lift.setSlidesTarget(400)
+
+
                         )
                 )
                 )

@@ -19,6 +19,7 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
 
         // Initialize default servo positions
         //hey guys viv was here
+        double clawpos;
         double arm1pos = 0.02;
         double arm2pos = 0.02;
         double wristpos= 0.91;
@@ -185,8 +186,7 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
                 }
             }
 
-            // Sets position of claw, arms and wrist
-            claw.setPosition(gamepad1.right_trigger * 0.3);
+            claw.setPosition(1-gamepad1.right_trigger);
             arm1.setPosition(arm1pos);
             arm2.setPosition(arm2pos);
             wrist.setPosition((wristpos));
