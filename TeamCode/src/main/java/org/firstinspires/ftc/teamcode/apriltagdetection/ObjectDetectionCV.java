@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.apriltagdetection;
 
+import static java.lang.Math.max;
+
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -21,8 +23,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
+import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
@@ -35,11 +39,13 @@ import java.util.ArrayList;
 public class ObjectDetectionCV extends LinearOpMode{
 
     OpenCvCamera camera;
+
+    int location;
     public void runOpMode(){
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
 
-        camera.setPipeline(new DetectionPipeline());
+        camera.setPipeline(new DetectionPipeline1());
 
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
         {
@@ -56,7 +62,7 @@ public class ObjectDetectionCV extends LinearOpMode{
         });
     }
 
-    public class DetectionPipeline extends OpenCvPipeline{
+    public class DetectionPipeline1 extends OpenCvPipeline{
         public Mat processFrame(Mat input){
 
             Imgproc.cvtColor(input,input,Imgproc.COLOR_RGB2YCrCb);
@@ -64,6 +70,76 @@ public class ObjectDetectionCV extends LinearOpMode{
             Rect middle = new Rect(267,1,266,400);
             Rect right = new Rect(533,1,267,400);
 
+            Mat leftCrop=input.submat(left);
+            Mat middleCrop=input.submat(middle);
+            Mat rightCrop=input.submat(right);
+
+            Core.extractChannel(leftCrop, leftCrop, 3);
+            Core.extractChannel(middleCrop, middleCrop, 3);
+            Core.extractChannel(rightCrop, rightCrop, 3);
+
+            double leftavg = (int)Core.mean(leftCrop).val[0];
+            double midavg = (int)Core.mean(middleCrop).val[0];
+            double rightavg = (int)Core.mean(rightCrop).val[0];
+
+            if (leftavg>midavg) {
+                if(leftavg>rightavg){
+                    location=1;
+                }
+                else{
+                    location=3;
+                }
+            }
+            else{
+                if(midavg>rightavg){
+                    location=2;
+                }
+                else{
+                    location=3;
+                }
+            }
+            return input;
+        }
+    }
+    public class DetectionPipeline2 extends OpenCvPipeline{
+
+        public Scalar lower = new Scalar(0,0,0);
+        public Scalar upper = new Scalar (255,255,255);
+        public Mat processFrame(Mat input){
+
+            Imgproc.cvtColor(input,input,Imgproc.COLOR_RGB2YCrCb);
+            Rect left = new Rect(1,1,267,400);
+            Rect middle = new Rect(267,1,266,400);
+            Rect right = new Rect(533,1,267,400);
+
+            Mat leftCrop=input.submat(left);
+            Mat middleCrop=input.submat(middle);
+            Mat rightCrop=input.submat(right);
+
+            Core.inRange(leftCrop, lower, upper, leftCrop);
+            Core.inRange(middleCrop, lower, upper, middleCrop);
+            Core.inRange(rightCrop, lower, upper, rightCrop);
+
+            double leftavg = (int)Core.mean(leftCrop).val[0];
+            double midavg = (int)Core.mean(middleCrop).val[0];
+            double rightavg = (int)Core.mean(rightCrop).val[0];
+
+            if (leftavg>midavg) {
+                if(leftavg>rightavg){
+                    location=1;
+                }
+                else{
+                    location=3;
+                }
+            }
+            else{
+                if(midavg>rightavg){
+                    location=2;
+                }
+                else{
+                    location=3;
+                }
+            }
             return input;
         }
     }
