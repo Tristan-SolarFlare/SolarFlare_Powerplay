@@ -41,7 +41,7 @@ public class MidCycleAutoTetsByTristan extends LinearOpMode {
     int rightTag = 19;
     AprilTagDetection tagOfInterest = null;
     public int target = 0;
-    double Kp = 0.02;
+    double Kp = 0.01;
     boolean isLiftMoving= false;
     int iterations = 0;
     double arm1pos = 0.02;
@@ -85,7 +85,7 @@ public class MidCycleAutoTetsByTristan extends LinearOpMode {
         }
         public class CloseClaw implements Action{
             public boolean run(@NonNull TelemetryPacket telemetryPacket){
-                clawpos = 0.2;
+                clawpos = 0;
                 return false;
             }
         }
@@ -198,30 +198,30 @@ public class MidCycleAutoTetsByTristan extends LinearOpMode {
         //set staring position, unit is inches
         DriveInitialDeposit = drive.actionBuilder(drive.pose)
                 .turn(Math.toRadians(90))
-                .strafeTo(new Vector2d(45,36))
+                .strafeTo(new Vector2d(45,40))
                 .waitSeconds(0.4)
                 .build();
 
-        DriveToIntakeFromInitialDeposit = drive.actionBuilder(new Pose2d(45,36,Math.toRadians(90)))
+        DriveToIntakeFromInitialDeposit = drive.actionBuilder(new Pose2d(45,40,Math.toRadians(90)))
                 .strafeTo(new Vector2d(57,36))
                 .strafeTo(new Vector2d(56.5,12))
                 .waitSeconds(0.2)
                 .build();
 
-        DriveToIntake = drive.actionBuilder(new Pose2d(55,38,Math.toRadians(120)))
+        DriveToIntake = drive.actionBuilder(new Pose2d(55,39,Math.toRadians(120)))
                 .strafeToLinearHeading(new Vector2d(56,12),Math.toRadians(90))
                 .waitSeconds(0.2)
                 .build();
-        Action DriveToIntake2 = drive.actionBuilder(new Pose2d(55,38,Math.toRadians(120)))
+        Action DriveToIntake2 = drive.actionBuilder(new Pose2d(55,39,Math.toRadians(120)))
                 .strafeToLinearHeading(new Vector2d(56,12),Math.toRadians(90))
                 .waitSeconds(0.2)
                 .build();
 
-        Action DriveToIntake3 = drive.actionBuilder(new Pose2d(55,38,Math.toRadians(120)))
+        Action DriveToIntake3 = drive.actionBuilder(new Pose2d(55,39,Math.toRadians(120)))
                 .strafeToLinearHeading(new Vector2d(56,12),Math.toRadians(90))
                 .waitSeconds(0.2)
                 .build();
-        Action DriveToIntake4 = drive.actionBuilder(new Pose2d(55,38,Math.toRadians(120)))
+        Action DriveToIntake4 = drive.actionBuilder(new Pose2d(55,39,Math.toRadians(120)))
                 .strafeToLinearHeading(new Vector2d(56,12),Math.toRadians(90))
                 .waitSeconds(0.2)
                 .build();
@@ -230,25 +230,25 @@ public class MidCycleAutoTetsByTristan extends LinearOpMode {
 
 
         DriveToDeposit = drive.actionBuilder(new Pose2d(56,12,Math.toRadians(90)))
-                .strafeToLinearHeading(new Vector2d(55,38),Math.toRadians(120))
+                .strafeToLinearHeading(new Vector2d(55,39),Math.toRadians(125))
                 .waitSeconds(0.4)
                 .build();
 
         Action DriveToDeposit2 = drive.actionBuilder(new Pose2d(56,12,Math.toRadians(90)))
-                .strafeToLinearHeading(new Vector2d(55,38),Math.toRadians(120))
+                .strafeToLinearHeading(new Vector2d(55,39),Math.toRadians(125))
                 .waitSeconds(0.4)
                 .build();
 
         Action DriveToDeposit3 = drive.actionBuilder(new Pose2d(56,12,Math.toRadians(90)))
-                .strafeToLinearHeading(new Vector2d(55,38),Math.toRadians(120))
+                .strafeToLinearHeading(new Vector2d(55,39),Math.toRadians(125))
                 .waitSeconds(0.4)
                 .build();
         Action DriveToDeposit4 = drive.actionBuilder(new Pose2d(56,12,Math.toRadians(90)))
-                .strafeToLinearHeading(new Vector2d(55,38),Math.toRadians(120))
+                .strafeToLinearHeading(new Vector2d(55,39),Math.toRadians(125))
                 .waitSeconds(0.4)
                 .build();
         Action DriveToDeposit5= drive.actionBuilder(new Pose2d(56,12,Math.toRadians(90)))
-                .strafeToLinearHeading(new Vector2d(55,38),Math.toRadians(120))
+                .strafeToLinearHeading(new Vector2d(55,39),Math.toRadians(125))
                 .waitSeconds(0.4)
                 .build();
 
@@ -256,17 +256,17 @@ public class MidCycleAutoTetsByTristan extends LinearOpMode {
 
 
 
-        ParkZone1 = drive.actionBuilder(new Pose2d(55,38,Math.toRadians(120)))
+        ParkZone1 = drive.actionBuilder(new Pose2d(55,39,Math.toRadians(125)))
                 .turn(Math.toRadians(-120))
                 .strafeTo(new Vector2d(36,36))
                 .strafeTo(new Vector2d(36,60))
                 .build();
 
-        ParkZone2 = drive.actionBuilder(new Pose2d(55,38,Math.toRadians(120)))
+        ParkZone2 = drive.actionBuilder(new Pose2d(55,39,Math.toRadians(125)))
                 .turn(Math.toRadians(-120))
                 .build();
 
-        ParkZone3 = drive.actionBuilder(new Pose2d(55,38,Math.toRadians(120)))
+        ParkZone3 = drive.actionBuilder(new Pose2d(55,39,Math.toRadians(125)))
                 .turn(Math.toRadians(-120))
                 .strafeTo(new Vector2d(36,36))
                 .strafeTo(new Vector2d(36,12))
@@ -352,6 +352,8 @@ public class MidCycleAutoTetsByTristan extends LinearOpMode {
         if(tagOfInterest == null){
 
             // Runs autonomous and parks in zone 2
+
+            //VIV here 3.141592653
             // Runs if camera does not detect april tag
             parkingZone = ParkZone2;
         }
@@ -366,6 +368,7 @@ public class MidCycleAutoTetsByTristan extends LinearOpMode {
         else if (tagOfInterest.id == rightTag){
 
             parkingZone = ParkZone3;
+            // Viv did this comment
         }
         Lift lift = new Lift();
         Actions.runBlocking(new SequentialAction(
@@ -381,21 +384,22 @@ public class MidCycleAutoTetsByTristan extends LinearOpMode {
 
                                         //new SleepAction(0.2),
                                         lift.openClaw(),
-                                        //new SleepAction(0.2),
+                                        new SleepAction(0.2),
 
                                         new ParallelAction(
                                                 lift.setTarget(150),
                                                 DriveToIntakeFromInitialDeposit
                                         ),
 
-                                        new SleepAction(0.2),
+                                        //new SleepAction(0.2),
                                         lift.closeClaw(),
-                                        //new SleepAction(0.1),
+                                        new SleepAction(0.3),
 
                                         new ParallelAction(
                                                 DriveToDeposit,
                                                 new SequentialAction(
                                                         lift.setTarget(300),
+                                                        new SleepAction(0.5),
                                                         lift.midJunction()
                                                 )
 
@@ -404,7 +408,7 @@ public class MidCycleAutoTetsByTristan extends LinearOpMode {
                                         //new SleepAction((0.2)),
 
                                         lift.openClaw(),
-                                        //new SleepAction(0.2),
+                                        new SleepAction(0.2),
 
                                         new ParallelAction(
                                                 lift.setTarget(120),
@@ -413,12 +417,13 @@ public class MidCycleAutoTetsByTristan extends LinearOpMode {
 
                                         new SleepAction(0.2),
                                         lift.closeClaw(),
-                                        //new SleepAction(0.1),
+                                        new SleepAction(0.3),
 
                                         new ParallelAction(
                                                 DriveToDeposit2,
                                                 new SequentialAction(
                                                         lift.setTarget(300),
+                                                        new SleepAction(0.5),
                                                         lift.midJunction()
                                                 )
 
@@ -427,7 +432,7 @@ public class MidCycleAutoTetsByTristan extends LinearOpMode {
                                         //new SleepAction((0.2)),
 
                                         lift.openClaw(),
-                                        //new SleepAction(0.2),
+                                        new SleepAction(0.2),
 
                                         new ParallelAction(
                                                 lift.setTarget(85),
@@ -436,21 +441,22 @@ public class MidCycleAutoTetsByTristan extends LinearOpMode {
 
                                         new SleepAction(0.2),
                                         lift.closeClaw(),
-                                        //new SleepAction(0.1),
+                                        new SleepAction(0.3),
 
                                         new ParallelAction(
                                                 DriveToDeposit3,
                                                 new SequentialAction(
                                                         lift.setTarget(300),
+                                                        new SleepAction(0.5),
                                                         lift.midJunction()
                                                 )
 
                                         ),
 
-                                       // new SleepAction((0.2)),
+                                        // new SleepAction((0.2)),
 
                                         lift.openClaw(),
-                                        //new SleepAction(0.2),
+                                        new SleepAction(0.2),
 
                                         new ParallelAction(
                                                 lift.setTarget(40),
@@ -459,12 +465,13 @@ public class MidCycleAutoTetsByTristan extends LinearOpMode {
 
                                         new SleepAction(0.2),
                                         lift.closeClaw(),
-                                        //new SleepAction(0.1),
+                                        new SleepAction(0.3),
 
                                         new ParallelAction(
                                                 DriveToDeposit4,
                                                 new SequentialAction(
                                                         lift.setTarget(300),
+                                                        new SleepAction(0.5),
                                                         lift.midJunction()
                                                 )
 
@@ -473,7 +480,7 @@ public class MidCycleAutoTetsByTristan extends LinearOpMode {
                                         //new SleepAction((0.2)),
 
                                         lift.openClaw(),
-                                        //new SleepAction(0.2),
+                                        new SleepAction(0.2),
 
                                         new ParallelAction(
                                                 lift.setTarget(0),
@@ -482,20 +489,27 @@ public class MidCycleAutoTetsByTristan extends LinearOpMode {
 
                                         new SleepAction(0.2),
                                         lift.closeClaw(),
-                                        //new SleepAction(0.1),
+                                        new SleepAction(0.3),
 
                                         new ParallelAction(
                                                 DriveToDeposit5,
                                                 new SequentialAction(
                                                         lift.setTarget(300),
+                                                        new SleepAction(0.5),
                                                         lift.midJunction()
                                                 )
 
                                         ),
 
                                         lift.openClaw(),
+                                        new SleepAction(0.2),
 
-                                        parkingZone
+
+                                        new ParallelAction(
+                                                parkingZone,
+                                                lift.defaultPosition()
+                                        )
+
 
 
                                 )
@@ -509,7 +523,6 @@ public class MidCycleAutoTetsByTristan extends LinearOpMode {
         }
     }
 }
-
 
 
 
