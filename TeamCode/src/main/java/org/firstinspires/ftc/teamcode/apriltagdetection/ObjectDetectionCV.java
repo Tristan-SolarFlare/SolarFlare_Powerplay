@@ -98,6 +98,8 @@ public class ObjectDetectionCV extends LinearOpMode{
                     location=3;
                 }
             }
+            Core.extractChannel(input,input,3);
+            telemetry.addData("Location",location);
             return input;
         }
     }
@@ -140,7 +142,10 @@ public class ObjectDetectionCV extends LinearOpMode{
                     location=3;
                 }
             }
+            Core.inRange(input, lower, upper, input);
+            telemetry.addData("Location",location);
             return input;
+
         }
     }
 
