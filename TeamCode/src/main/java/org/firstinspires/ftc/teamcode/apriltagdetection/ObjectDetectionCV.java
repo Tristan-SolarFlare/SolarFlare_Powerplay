@@ -103,8 +103,8 @@ public class ObjectDetectionCV extends LinearOpMode{
     }
     public class DetectionPipeline2 extends OpenCvPipeline{
 
-        public Scalar lower = new Scalar(0,0,0);
-        public Scalar upper = new Scalar (255,255,255);
+        public Scalar lower = new Scalar(83,107,184);
+        public Scalar upper = new Scalar(108,110,176);
         public Mat processFrame(Mat input){
 
             Imgproc.cvtColor(input,input,Imgproc.COLOR_RGB2YCrCb);
