@@ -36,7 +36,7 @@ import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.ArrayList;
 @Autonomous
-public class ObjectDetectionCV extends LinearOpMode{
+public class SimpleObjectDetectionCV extends LinearOpMode{
 
     OpenCvCamera camera;
 
