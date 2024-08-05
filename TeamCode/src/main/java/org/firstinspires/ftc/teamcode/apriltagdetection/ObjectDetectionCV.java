@@ -48,9 +48,9 @@ public class ObjectDetectionCV extends LinearOpMode{
         public Mat processFrame(Mat input){
 
             Imgproc.cvtColor(input,input,Imgproc.COLOR_RGB2YCrCb);
-            Rect left = new Rect(1,1,400,400);
-            Rect right = new Rect(400,1,400,400);
-            Rect top = new Rect(1,300,800,100);
+            Rect left = new Rect(1,1,400,448);
+            Rect right = new Rect(400,1,400,448);
+            Rect top = new Rect(1,348,800,100);
 
             Mat leftCrop=input.submat(left);
             Mat rightCrop=input.submat(right);
