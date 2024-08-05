@@ -20,11 +20,12 @@ public class ObjectDetectionCV extends LinearOpMode{
     OpenCvCamera camera;
 
     int location;
+    boolean arrived=false;
     public void runOpMode(){
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
 
-        camera.setPipeline(new DetectionPipeline1());
+        camera.setPipeline(new DetectionPipeline2());
 
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
         {
@@ -45,9 +46,9 @@ public class ObjectDetectionCV extends LinearOpMode{
         public Mat processFrame(Mat input){
 
             Imgproc.cvtColor(input,input,Imgproc.COLOR_RGB2YCrCb);
-            Rect left = new Rect(1,1,267,400);
-            Rect middle = new Rect(267,1,266,400);
-            Rect right = new Rect(533,1,267,400);
+            Rect left = new Rect(1,1,370,400);
+            Rect middle = new Rect(370,1,60,400);
+            Rect right = new Rect(430,1,370,400);
 
             Mat leftCrop=input.submat(left);
             Mat middleCrop=input.submat(middle);
@@ -57,28 +58,28 @@ public class ObjectDetectionCV extends LinearOpMode{
             Core.extractChannel(middleCrop, middleCrop, 3);
             Core.extractChannel(rightCrop, rightCrop, 3);
 
-            double leftavg = (int)Core.mean(leftCrop).val[0];
-            double midavg = (int)Core.mean(middleCrop).val[0];
-            double rightavg = (int)Core.mean(rightCrop).val[0];
+            double leftavg = Core.mean(leftCrop).val[0];
+            double midavg = Core.mean(middleCrop).val[0];
+            double rightavg = Core.mean(rightCrop).val[0];
 
-            if (leftavg>midavg) {
-                if(leftavg>rightavg){
-                    location=1;
-                }
-                else{
-                    location=3;
-                }
+            if (midavg>leftavg && midavg>rightavg){
+                location=2;
+            }
+            else if(leftavg>midavg && leftavg>rightavg){
+                location=1;
+            }
+            else if(rightavg>midavg && rightavg>leftavg){
+                location=3;
             }
             else{
-                if(midavg>rightavg){
-                    location=2;
-                }
-                else{
-                    location=3;
-                }
+                location=0;
             }
+            //bro ngl this one's kinda weird if the cone is not guaranteed to be in view
             Core.extractChannel(input,input,3);
             telemetry.addData("Location",location);
+            telemetry.addData("left",leftavg);
+            telemetry.addData("mid",midavg);
+            telemetry.addData("right",rightavg);
             return input;
         }
     }
@@ -89,40 +90,42 @@ public class ObjectDetectionCV extends LinearOpMode{
         public Mat processFrame(Mat input){
 
             Imgproc.cvtColor(input,input,Imgproc.COLOR_RGB2YCrCb);
-            Rect left = new Rect(1,1,267,400);
-            Rect middle = new Rect(267,1,266,400);
-            Rect right = new Rect(533,1,267,400);
+            Rect left = new Rect(1,1,400,400);
+            Rect right = new Rect(400,1,400,400);
+            Rect top = new Rect(1,300,800,100);
 
             Mat leftCrop=input.submat(left);
-            Mat middleCrop=input.submat(middle);
             Mat rightCrop=input.submat(right);
+            Mat topCrop=input.submat(top);
 
             Core.inRange(leftCrop, lower, upper, leftCrop);
-            Core.inRange(middleCrop, lower, upper, middleCrop);
             Core.inRange(rightCrop, lower, upper, rightCrop);
+            Core.inRange(topCrop, lower, upper, topCrop);
+            Core.inRange(input, lower, upper, input);
 
-            double leftavg = (int)Core.mean(leftCrop).val[0];
-            double midavg = (int)Core.mean(middleCrop).val[0];
-            double rightavg = (int)Core.mean(rightCrop).val[0];
+            double leftavg = Core.mean(leftCrop).val[0];
+            double rightavg = Core.mean(rightCrop).val[0];
+            double topavg= Core.mean(topCrop).val[0];
 
-            if (leftavg>midavg) {
-                if(leftavg>rightavg){
-                    location=1;
+            if (Math.abs(leftavg-rightavg)<1) {
+                location=2;
+                if(topavg>0){
+                    arrived=true;
                 }
-                else{
-                    location=3;
-                }
+            }
+            else if(leftavg>0){
+                location=1;
+            }
+            else if(rightavg>0){
+                location=3;
             }
             else{
-                if(midavg>rightavg){
-                    location=2;
-                }
-                else{
-                    location=3;
-                }
+                location=0;
             }
-            Core.inRange(input, lower, upper, input);
             telemetry.addData("Location",location);
+            telemetry.addData("left",leftavg);
+            telemetry.addData("right",rightavg);
+            telemetry.addData("Arrived", arrived);
             return input;
 
         }
