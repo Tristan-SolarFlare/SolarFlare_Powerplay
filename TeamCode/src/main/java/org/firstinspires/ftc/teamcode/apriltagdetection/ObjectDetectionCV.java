@@ -30,7 +30,7 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvPipeline;
-
+import java.util.ArrayList;
 @Autonomous
 public class ObjectDetectionCV extends LinearOpMode{
     DcMotor leftFront;
@@ -41,6 +41,7 @@ public class ObjectDetectionCV extends LinearOpMode{
     OpenCvCamera camera;
 
     int location;
+    ArrayList<Integer> junction=new ArrayList<>();
     boolean arrived=false;
     public void runOpMode(){
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -77,6 +78,9 @@ public class ObjectDetectionCV extends LinearOpMode{
 
         public Scalar lower = new Scalar(83,107,184);
         public Scalar upper = new Scalar(108,110,176);
+        public Scalar lowjunction = new Scalar(145,157,85);
+        public Scalar upjunction = new Scalar(192,155,86);
+
         public Mat processFrame(Mat input){
             Mat junctions= new Mat();
             Imgproc.cvtColor(input,input,Imgproc.COLOR_RGB2YCrCb);
@@ -117,11 +121,31 @@ public class ObjectDetectionCV extends LinearOpMode{
             else{
                 location=0;
             }
-
             telemetry.addData("Location",location);
             telemetry.addData("left",leftavg);
             telemetry.addData("right",rightavg);
             telemetry.addData("Arrived", arrived);
+
+            Rect rectsect;
+
+            ArrayList<Integer> scan=new ArrayList<>();
+            for(int i=1;i<16;i++){
+                rectsect = new Rect(53*(i-1)+1,1,53*i,448);
+                Mat section = input.submat(rectsect);
+                Core.inRange(section, lowjunction, upjunction, section);
+                double avg = Core.mean(section).val[0];
+                if(avg>0){
+                    scan.add(53*i);
+                    if(scan.size()>=3){
+                        junction=scan;
+                        break;
+                    }
+                }
+                else{
+                    scan.clear();
+                }
+            }
+            telemetry.addData("Junction",junction.get(0).toString()+junction.get(junction.size()-1).toString());
             return input;
 
         }
