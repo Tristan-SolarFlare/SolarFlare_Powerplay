@@ -44,6 +44,8 @@ public class ObjectDetectionCV extends LinearOpMode{
     ArrayList<Integer> junction=new ArrayList<>();
     boolean arrived=false;
     public void runOpMode(){
+        leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -129,14 +131,16 @@ public class ObjectDetectionCV extends LinearOpMode{
             Rect rectsect;
 
             ArrayList<Integer> scan=new ArrayList<>();
+            boolean foundJunction = false;
             for(int i=1;i<16;i++){
                 rectsect = new Rect(53*(i-1)+1,1,53*i,448);
                 Mat section = input.submat(rectsect);
                 Core.inRange(section, lowjunction, upjunction, section);
                 double avg = Core.mean(section).val[0];
                 if(avg>0){
-                    scan.add(53*i);
+                    scan.add(i);
                     if(scan.size()>=3){
+                        foundJunction=true;
                         junction=scan;
                         break;
                     }
@@ -145,7 +149,10 @@ public class ObjectDetectionCV extends LinearOpMode{
                     scan.clear();
                 }
             }
-            telemetry.addData("Junction",junction.get(0).toString()+junction.get(junction.size()-1).toString());
+            if(!foundJunction){
+                junction=new ArrayList<>();
+            }
+            telemetry.addData("Junction", Integer.valueOf(53*junction.get(0)).toString()+Integer.valueOf(53*junction.get(junction.size()-1)).toString());
             return input;
 
         }
@@ -184,18 +191,14 @@ public class ObjectDetectionCV extends LinearOpMode{
     }
     public class DodgeJunction implements Action {
         public boolean run(@NonNull TelemetryPacket packet){
-            if(location==2 && !arrived){
-                leftFront.setPower(-1);
-                leftBack.setPower(-1);
+            if((junction.get(0)+junction.get(junction.size()-1))/2<=8){
+                leftFront.setPower(1);
                 rightFront.setPower(-1);
+                leftBack.setPower(1);
                 rightBack.setPower(-1);
-            }
-            else{
-                leftFront.setPower(0);
-                leftBack.setPower(0);
-                rightFront.setPower(0);
-                rightBack.setPower(0);
-            }
+
+;            }
+
             return true;
         }
     }
