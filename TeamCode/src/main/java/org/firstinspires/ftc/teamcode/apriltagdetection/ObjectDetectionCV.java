@@ -40,10 +40,84 @@ public class ObjectDetectionCV extends LinearOpMode{
     MecanumDrive drive;
     OpenCvCamera camera;
 
+    Servo claw;
     int location;
     ArrayList<Integer> junction=new ArrayList<>();
     boolean arrived=false;
+
+    public class TurnToCone implements Action {
+        public boolean run(@NonNull TelemetryPacket packet){
+            if(location==3 || location==0){
+                Actions.runBlocking(drive.actionBuilder(drive.pose)
+                        .turn(Math.toRadians(10))
+                );
+            }
+            else if(location==1){
+                Actions.runBlocking(drive.actionBuilder(drive.pose)
+                        .turn(Math.toRadians(-10))
+                );
+            }
+            return !arrived;
+        }
+    }
+
+    public class MoveToCone implements Action {
+        public boolean run(@NonNull TelemetryPacket packet){
+            if(location==2 && !arrived){
+                leftFront.setPower(-1);
+                leftBack.setPower(-1);
+                rightFront.setPower(-1);
+                rightBack.setPower(-1);
+            }
+            else{
+                leftFront.setPower(0);
+                leftBack.setPower(0);
+                rightFront.setPower(0);
+                rightBack.setPower(0);
+            }
+            return !arrived;
+        }
+    }
+
+    public class DodgeJunction implements Action {
+        public boolean run(@NonNull TelemetryPacket packet){
+            if(!junction.isEmpty()) {
+                if ((junction.get(0) + junction.get(junction.size() - 1)) / 2 <= 8) {
+                    leftFront.setPower(1);
+                    rightFront.setPower(-1);
+                    leftBack.setPower(1);
+                    rightBack.setPower(-1);
+
+                    ;
+                } else {
+                    leftFront.setPower(-1);
+                    rightFront.setPower(1);
+                    leftBack.setPower(-1);
+                    rightBack.setPower(1);
+                }
+            }
+            return !arrived;
+        }
+    }
+
+    public class GrabCone implements Action {
+        public boolean run(@NonNull TelemetryPacket packet){
+            Actions.runBlocking(drive.actionBuilder(drive.pose).turn(Math.toRadians(180)).build());
+            leftFront.setPower(1);
+            leftBack.setPower(1);
+            rightFront.setPower(1);
+            rightBack.setPower(1);
+            sleep(400);
+            leftFront.setPower(0);
+            leftBack.setPower(0);
+            rightFront.setPower(0);
+            rightBack.setPower(0);
+            claw.setPosition(0);
+            return false;
+        }
+    }
     public void runOpMode(){
+        claw=hardwareMap.servo.get("claw");
         leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
         leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -55,6 +129,9 @@ public class ObjectDetectionCV extends LinearOpMode{
         leftBack = hardwareMap.dcMotor.get("leftBack");
         rightFront = hardwareMap.dcMotor.get("rightFront");
         rightBack = hardwareMap.dcMotor.get("rightBack");
+
+        claw.setPosition(1);
+        sleep(200);
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
 
@@ -73,8 +150,13 @@ public class ObjectDetectionCV extends LinearOpMode{
 
             }
         });
+        Actions.runBlocking(new SequentialAction(
+                drive.actionBuilder(drive.pose).turn(Math.toRadians(-90)).build(),
+                new ParallelAction(new TurnToCone(),new MoveToCone(),new DodgeJunction()),
+                new GrabCone()
+                )
+        );
 
-        Actions.runBlocking(drive.actionBuilder(drive.pose).turn(Math.toRadians(-90)));
     }
     public class ConeDetection extends OpenCvPipeline{
 
@@ -157,50 +239,4 @@ public class ObjectDetectionCV extends LinearOpMode{
 
         }
     }
-    public class TurnToCone implements Action {
-        public boolean run(@NonNull TelemetryPacket packet){
-            if(location==3 || location==0){
-                Actions.runBlocking(drive.actionBuilder(drive.pose)
-                        .turn(Math.toRadians(10))
-                );
-            }
-            else if(location==1){
-                Actions.runBlocking(drive.actionBuilder(drive.pose)
-                        .turn(Math.toRadians(-10))
-                );
-            }
-            return true;
-        }
-    }
-    public class MoveToCone implements Action {
-        public boolean run(@NonNull TelemetryPacket packet){
-            if(location==2 && !arrived){
-                leftFront.setPower(-1);
-                leftBack.setPower(-1);
-                rightFront.setPower(-1);
-                rightBack.setPower(-1);
-            }
-            else{
-                leftFront.setPower(0);
-                leftBack.setPower(0);
-                rightFront.setPower(0);
-                rightBack.setPower(0);
-            }
-            return true;
-        }
-    }
-    public class DodgeJunction implements Action {
-        public boolean run(@NonNull TelemetryPacket packet){
-            if((junction.get(0)+junction.get(junction.size()-1))/2<=8){
-                leftFront.setPower(1);
-                rightFront.setPower(-1);
-                leftBack.setPower(1);
-                rightBack.setPower(-1);
-
-;            }
-
-            return true;
-        }
-    }
-
 }
