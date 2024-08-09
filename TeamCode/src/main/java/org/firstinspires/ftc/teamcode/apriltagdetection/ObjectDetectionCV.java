@@ -234,7 +234,7 @@ public class ObjectDetectionCV extends LinearOpMode{
             if(!foundJunction){
                 junction=new ArrayList<>();
             }
-            telemetry.addData("Junction", Integer.valueOf(53*junction.get(0)).toString()+Integer.valueOf(53*junction.get(junction.size()-1)).toString());
+            telemetry.addData("Junction", junction.get(0).toString()+junction.get(junction.size()-1).toString());
             return input;
 
         }
