@@ -42,10 +42,11 @@ public class SimpleObjectDetectionCV extends LinearOpMode{
 
     int location;
     public void runOpMode(){
+        waitForStart();
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
 
-        camera.setPipeline(new DetectionPipeline1());
+        camera.setPipeline(new DetectionPipeline2());
 
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
         {

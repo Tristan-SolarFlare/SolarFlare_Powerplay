@@ -117,6 +117,7 @@ public class ObjectDetectionCV extends LinearOpMode{
         }
     }
     public void runOpMode(){
+        waitForStart();
         claw=hardwareMap.servo.get("claw");
         leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
         leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
