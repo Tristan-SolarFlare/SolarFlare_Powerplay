@@ -52,6 +52,7 @@ public class TeleopWithCamera extends LinearOpMode {
     int location;
     ArrayList<Integer> junction=new ArrayList<>();
     boolean arrived=false;
+    OpenCvCamera camera;
     class Pipeline extends OpenCvPipeline{
         public Scalar lower = new Scalar(83,107,184);
         public Scalar upper = new Scalar(108,110,176);
@@ -137,7 +138,24 @@ public class TeleopWithCamera extends LinearOpMode {
     }
     @Override
     public void runOpMode() throws InterruptedException {
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
 
+        camera.setPipeline(new Pipeline());
+
+        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
+        {
+            @Override
+            public void onOpened()
+            {
+                camera.startStreaming(800,448, OpenCvCameraRotation.UPRIGHT);
+            }
+
+            @Override
+            public void onError(int errorCode){
+
+            }
+        });
         // Initialize default servo positions
         //hey guys viv was here
         double clawpos;

@@ -117,7 +117,10 @@ public class ObjectDetectionCV extends LinearOpMode{
         }
     }
     public void runOpMode(){
-        waitForStart();
+        leftFront = hardwareMap.dcMotor.get("leftFront");
+        leftBack = hardwareMap.dcMotor.get("leftBack");
+        rightFront = hardwareMap.dcMotor.get("rightFront");
+        rightBack = hardwareMap.dcMotor.get("rightBack");
         claw=hardwareMap.servo.get("claw");
         leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
         leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -126,11 +129,6 @@ public class ObjectDetectionCV extends LinearOpMode{
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         drive=new MecanumDrive(hardwareMap, new Pose2d(11, 36, Math.toRadians(0)));
-        leftFront = hardwareMap.dcMotor.get("leftFront");
-        leftBack = hardwareMap.dcMotor.get("leftBack");
-        rightFront = hardwareMap.dcMotor.get("rightFront");
-        rightBack = hardwareMap.dcMotor.get("rightBack");
-
         claw.setPosition(1);
         sleep(200);
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
@@ -151,13 +149,13 @@ public class ObjectDetectionCV extends LinearOpMode{
 
             }
         });
+        waitForStart();
         Actions.runBlocking(new SequentialAction(
                 drive.actionBuilder(drive.pose).turn(Math.toRadians(-90)).build(),
                 new ParallelAction(new TurnToCone(),new MoveToCone(),new DodgeJunction()),
                 new GrabCone()
                 )
         );
-
     }
     public class ConeDetection extends OpenCvPipeline{
 
