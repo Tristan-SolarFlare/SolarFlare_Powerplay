@@ -49,12 +49,12 @@ public class ObjectDetectionCV extends LinearOpMode{
         public boolean run(@NonNull TelemetryPacket packet){
             if(location==3 || location==0){
                 Actions.runBlocking(drive.actionBuilder(drive.pose)
-                        .turn(Math.toRadians(10))
+                        .turn(Math.toRadians(10)).build()
                 );
             }
             else if(location==1){
                 Actions.runBlocking(drive.actionBuilder(drive.pose)
-                        .turn(Math.toRadians(-10))
+                        .turn(Math.toRadians(-10)).build()
                 );
             }
             return !arrived;

@@ -46,6 +46,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 @TeleOp
 public class TeleopWithCamera extends LinearOpMode {
 
+
     boolean Switch = true;
 
     int location;
