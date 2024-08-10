@@ -197,12 +197,11 @@ public class MidCycleAutoTetsByTristan extends LinearOpMode {
 
         //set staring position, unit is inches
         DriveInitialDeposit = drive.actionBuilder(drive.pose)
-                .turn(Math.toRadians(90))
-                .strafeTo(new Vector2d(45,40))
+                .strafeToLinearHeading(new Vector2d(46,40),Math.toRadians(90))
                 .waitSeconds(0.4)
                 .build();
 
-        DriveToIntakeFromInitialDeposit = drive.actionBuilder(new Pose2d(45,40,Math.toRadians(90)))
+        DriveToIntakeFromInitialDeposit = drive.actionBuilder(new Pose2d(46,40,Math.toRadians(90)))
                 .strafeTo(new Vector2d(57,36))
                 .strafeTo(new Vector2d(56.5,12))
                 .waitSeconds(0.2)
@@ -257,19 +256,15 @@ public class MidCycleAutoTetsByTristan extends LinearOpMode {
 
 
         ParkZone1 = drive.actionBuilder(new Pose2d(55,39,Math.toRadians(125)))
-                .turn(Math.toRadians(-120))
-                .strafeTo(new Vector2d(36,36))
-                .strafeTo(new Vector2d(36,60))
+                .strafeToLinearHeading(new Vector2d(60,60),Math.toRadians(180))
                 .build();
 
         ParkZone2 = drive.actionBuilder(new Pose2d(55,39,Math.toRadians(125)))
-                .turn(Math.toRadians(-120))
+                .turn(Math.toRadians(-125))
                 .build();
 
         ParkZone3 = drive.actionBuilder(new Pose2d(55,39,Math.toRadians(125)))
-                .turn(Math.toRadians(-120))
-                .strafeTo(new Vector2d(36,36))
-                .strafeTo(new Vector2d(36,12))
+                .strafeToLinearHeading(new Vector2d(60,12),Math.toRadians(180))
                 .build();
 
         boolean tagFound = false;
