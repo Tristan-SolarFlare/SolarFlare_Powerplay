@@ -107,7 +107,7 @@ public class SimpleObjectDetectionCV extends LinearOpMode{
     public class DetectionPipeline2 extends OpenCvPipeline{
 
         public Scalar lower = new Scalar(60,174,97);
-        public Scalar upper = new Scalar(108,176,110);
+        public Scalar upper = new Scalar(128,176,110);
         public Mat processFrame(Mat input){
 
             Imgproc.cvtColor(input,input,Imgproc.COLOR_RGB2YCrCb);
@@ -143,7 +143,6 @@ public class SimpleObjectDetectionCV extends LinearOpMode{
                     location=3;
                 }
             }
-            Core.inRange(input, lower, upper, input);
             telemetry.addData("Location",location);
             return input;
 
