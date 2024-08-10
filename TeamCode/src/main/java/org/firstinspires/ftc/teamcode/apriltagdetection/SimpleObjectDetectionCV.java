@@ -106,7 +106,7 @@ public class SimpleObjectDetectionCV extends LinearOpMode{
     }
     public class DetectionPipeline2 extends OpenCvPipeline{
 
-        public Scalar lower = new Scalar(80,174,97);
+        public Scalar lower = new Scalar(60,174,97);
         public Scalar upper = new Scalar(108,176,110);
         public Mat processFrame(Mat input){
 
