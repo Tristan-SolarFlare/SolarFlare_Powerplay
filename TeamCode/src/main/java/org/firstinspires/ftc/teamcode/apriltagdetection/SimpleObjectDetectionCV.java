@@ -142,6 +142,7 @@ public class SimpleObjectDetectionCV extends LinearOpMode{
                 }
             }
             telemetry.addData("Location",location);
+            telemetry.update();
             return input;
 
         }
