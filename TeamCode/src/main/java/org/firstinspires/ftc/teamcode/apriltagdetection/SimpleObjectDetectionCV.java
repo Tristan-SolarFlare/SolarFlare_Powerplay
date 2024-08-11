@@ -105,7 +105,7 @@ public class SimpleObjectDetectionCV extends LinearOpMode{
         }
     }
     public class DetectionPipeline2 extends OpenCvPipeline{
-        public Scalar lower = new Scalar(0,0,155);
+        public Scalar lower = new Scalar(20,20,80);
         public Scalar upper = new Scalar(125,150,255);
         public Mat processFrame(Mat input){
 
@@ -142,7 +142,7 @@ public class SimpleObjectDetectionCV extends LinearOpMode{
                 }
             }
             telemetry.addData("Location",location);
-            Core.inRange(input, lower, upper, input);
+            Core.inRange(input, new Scalar(0,0,0), new Scalar(255,255,255), input);
             return input;
 
         }
