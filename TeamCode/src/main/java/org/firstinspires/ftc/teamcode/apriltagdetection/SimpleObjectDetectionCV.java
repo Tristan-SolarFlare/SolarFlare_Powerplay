@@ -143,7 +143,7 @@ public class SimpleObjectDetectionCV extends LinearOpMode{
             }
             telemetry.addData("Location",location);
             telemetry.update();
-            Core.inRange(input, new Scalar(0,0,50,0), new Scalar(175,190,255,255), input);
+            Core.inRange(input, lower, upper, input);
             return input;
 
         }
