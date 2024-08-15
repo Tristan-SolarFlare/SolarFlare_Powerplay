@@ -159,14 +159,13 @@ public class ObjectDetectionCV extends LinearOpMode{
     }
     public class ConeDetection extends OpenCvPipeline{
 
-        public Scalar lower = new Scalar(83,107,184);
-        public Scalar upper = new Scalar(108,110,176);
-        public Scalar lowjunction = new Scalar(145,157,85);
-        public Scalar upjunction = new Scalar(192,155,86);
+        public Scalar lower = new Scalar(0,0,60,0);
+        public Scalar upper = new Scalar(60,60,180,255);
+        public Scalar lowjunction = new Scalar(196,143,63,0);
+        public Scalar upjunction = new Scalar(248,199,120,255);
 
         public Mat processFrame(Mat input){
             Mat junctions= new Mat();
-            Imgproc.cvtColor(input,input,Imgproc.COLOR_RGB2YCrCb);
             input.copyTo(junctions);
 
             Rect left = new Rect(1,1,400,448);
