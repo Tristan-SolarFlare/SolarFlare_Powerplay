@@ -129,6 +129,17 @@ public class Test extends LinearOpMode {
                 return true;
             }
         }
+        public class MidJunction implements Action{
+            public boolean run(@NonNull TelemetryPacket telemetryPacket){
+                target = 130;
+                arm1pos = 0.96;
+                arm2pos = 0.96;
+                wristpos = 0.3;
+                clawpos = 0.0;
+                isLiftMoving = false;
+                return false;
+            }
+        }
         public class setTarget implements Action{
             int e;
             public setTarget(int a){
@@ -142,24 +153,28 @@ public class Test extends LinearOpMode {
                 return false;
             }
         }
-        public class SetSlidesTarget implements Action{
-            public boolean run(@NonNull TelemetryPacket telemetryPacket){
-                telemetry.addLine("SetSlidesTarget.run(" + target + ")");
+        public class setTargetBad implements Action{
+            int e;
+            public setTargetBad(int a){
+                target=a;
+            }
+            public boolean run(@NonNull TelemetryPacket packet){
+
+                arm1pos=0.02;
+                arm2pos=0.02;
+                wristpos=0.91;
                 return false;
             }
-            public SetSlidesTarget(int y){
-                target = y;
-            }
         }
-
-
-        public Action setSlidesTarget(int y){return  new SetSlidesTarget(y);}
+        public Action setTargetBad(int z){return new setTargetBad(z);}
         public Action globalPID() {return new GlobalPID();}
         public Action initialize(){return new Init();}
         public Action highJunction(){return new HighJunction();}
         public Action openClaw(){return new OpenClaw();}
         public Action defaultPosition(){return new DefaultPosition();}
         public Action setTarget(int z){return new setTarget(z);}
+
+        public Action midJunction(){return new MidJunction();}
     }
 
     public void runOpMode() {
@@ -310,10 +325,9 @@ public class Test extends LinearOpMode {
                 new ParallelAction(
                         lift.globalPID(),
                         new SequentialAction(
-                                lift.setSlidesTarget(300),
-                                new SleepAction(3),
-                                lift.setSlidesTarget(400)
-
+                               lift.setTargetBad(200),
+                               new SleepAction(1),
+                                lift.setTargetBad(400)
 
                         )
                 )
