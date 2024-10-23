@@ -36,7 +36,7 @@ public class FieldCentricMecanumTeleOp extends LinearOpMode {
         DcMotor leftBack = hardwareMap.dcMotor.get("leftBack");
         DcMotor rightFront = hardwareMap.dcMotor.get("rightFront");
         DcMotor rightBack = hardwareMap.dcMotor.get("rightBack");
-
+//vivtetsi
         Servo arm1 = hardwareMap.servo.get("arm");
         Servo arm2 = hardwareMap.servo.get("arm2");
 
